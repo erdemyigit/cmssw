@@ -103,6 +103,39 @@ chains.register_concentrator("Badae", concentrator.CreateAutoencoder(
     normByMax=False,
 ))
 
+#test models
+autoEncoder_training_2eLinks = cms.PSet(encoderModelFile = cms.FileInPath('/uscms/home/nswood/nobackup/Notebooks/TF_nswood_ECON_AE/small_model/encoder_Lion_CAE.pb'),
+                                        decoderModelFile = cms.FileInPath('/uscms/home/nswood/nobackup/Notebooks/TF_nswood_ECON_AE/small_model/decoder_Lion_CAE.pb'))
+
+linkToGraphMapping = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+#https://github.com/cms-sw/cmssw/blob/master/L1Trigger/L1THGCal/python/l1tHGCalConcentratorProducer_cfi.py#L200
+
+modelFiles = cms.VPSet([autoEncoder_training_2eLinks])
+
+#modelFiles = cms.VPSet([autoEncoder_training_2eLinks, autoEncoder_training_2eLinks, autoEncoder_training_2eLinks, autoEncoder_training_2eLinks])
+
+
+
+#Main problem is dealing with the conditioning in CMSSW
+#Conditioning on sum is easy enough, but not sure how to condition on eta
+
+#may have to reformat input as 58 inputs and reshape everything in keras model
+
+#what inputs are given in CMSSW to the AE? all 58
+
+#For inputs, just make sure it's the exact same as Rohan's and it should run
+
+#https://github.com/ssrothman/cmssw/blob/ECON_12_5_2_patch1/L1Trigger/L1THGCal/src/concentrator/HGCalConcentratorAutoEncoderImpl.cc
+
+chains.register_concentrator("NateAE", concentrator.CreateAutoencoder(
+    useTransverseADC=True,
+    skipAE=False,
+    modelFiles = modelFiles,
+    useModuleFactor=False,
+    bitShiftNormalization=True,
+    normByMax=False,
+))
+
 ## BE1
 chains.register_backend1("Dummy", clustering2d.CreateDummy())
 ## BE2
@@ -112,7 +145,7 @@ chains.register_selector("Dummy", selectors.CreateDummy())
 
 
 # Register trigger chains
-standard_concentrators = ['Threshold0', 'Threshold135', 'Bestchoice', 'Supertriggercell', 'Badae']
+standard_concentrators = ['Threshold0', 'Threshold135', 'Bestchoice', 'Supertriggercell', 'NateAE']
 for cc in standard_concentrators:
     chains.register_chain('Floatingpoint', cc, 'Dummy', 'Histomax', 'Dummy', 'nTuple')
 
