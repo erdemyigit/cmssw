@@ -27,13 +27,13 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(10)
+    input = cms.untracked.int32(50)
 )
 
 # Input source
 process.source = cms.Source("PoolSource",
     #fileNames = cms.untracked.vstring('file:DoubleElectron_FlatPt-1To100-gun_noPU.root'),
-    fileNames = cms.untracked.vstring('/store/mc/Phase2Fall22DRMiniAOD/DoubleElectron_FlatPt-1To100-gun/GEN-SIM-DIGI-RAW-MINIAOD/noPU_125X_mcRun4_realistic_v2-v1/2550000/066944a3-a061-42ac-ba45-9faadb46407a.root'),
+    fileNames = cms.untracked.vstring('file:/home/submit/srothman/cmsdata/ECON_datasets/DoubleElectron_FlatPt-1To100_PU200/MINIAOD/008bdb86-d408-48f5-9ee7-ab93cda56cc1.root'),
 
     inputCommands=cms.untracked.vstring(
         'keep *',
@@ -41,9 +41,7 @@ process.source = cms.Source("PoolSource",
     )
 )
 
-process.options = cms.untracked.PSet(
-
-)
+process.options = cms.untracked.PSet()
 process.options.numberOfThreads = cms.untracked.uint32(4)
 process.options.numberOfStreams = cms.untracked.uint32(4)
 
@@ -104,10 +102,18 @@ chains.register_concentrator("Badae", concentrator.CreateAutoencoder(
 ))
 
 #test models
-autoEncoder_training_2eLinks = cms.PSet(encoderModelFile = cms.FileInPath('/uscms/home/nswood/nobackup/Notebooks/TF_nswood_ECON_AE/small_model/encoder_Lion_CAE.pb'),
-                                        decoderModelFile = cms.FileInPath('/uscms/home/nswood/nobackup/Notebooks/TF_nswood_ECON_AE/small_model/decoder_Lion_CAE.pb'))
+autoEncoder_training_2eLinks = cms.PSet(encoderModelFile = cms.FileInPath('/work/submit/nswood/HGCAL/CMSSW_12_5_2_patch1/src/L1Trigger/L1THGCal/data/models/dummy_8_8/encoder_dummy_8_8.pb'),
+                                        decoderModelFile = cms.FileInPath('/work/submit/nswood/HGCAL/CMSSW_12_5_2_patch1/src/L1Trigger/L1THGCal/data/models/dummy_8_8/decoder_dummy_8_8.pb'))
+
+# autoEncoder_training_2eLinks = cms.PSet(encoderModelFile = cms.FileInPath('/work/submit/nswood/HGCAL/CMSSW_12_5_2_patch1/src/L1Trigger/L1THGCal/data/models/dummy_AE_4_4_3/encoder_dummy_4_4_3.pb'),
+#                                         decoderModelFile = cms.FileInPath('/work/submit/nswood/HGCAL/CMSSW_12_5_2_patch1/src/L1Trigger/L1THGCal/data/models/dummy_AE_4_4_3/decoder_dummy_4_4_3.pb'))
+
+
 
 linkToGraphMapping = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+remap_8x8 = [4, 12, 20, 28,  5, 13, 21, 29,  6, 14, 22, 30,  7, 15, 23, 31, 
+             24, 25, 26, 27, 16, 17, 18, 19,  8,  9, 10, 11,  0,  1,  2,  3, 
+             59, 51, 43, 35, 58, 50, 42, 34, 57, 49, 41, 33, 56, 48, 40, 32]
 #https://github.com/cms-sw/cmssw/blob/master/L1Trigger/L1THGCal/python/l1tHGCalConcentratorProducer_cfi.py#L200
 
 modelFiles = cms.VPSet([autoEncoder_training_2eLinks])
@@ -126,6 +132,14 @@ modelFiles = cms.VPSet([autoEncoder_training_2eLinks])
 #For inputs, just make sure it's the exact same as Rohan's and it should run
 
 #https://github.com/ssrothman/cmssw/blob/ECON_12_5_2_patch1/L1Trigger/L1THGCal/src/concentrator/HGCalConcentratorAutoEncoderImpl.cc
+triggerCellRemap = [28,29,30,31,0,4,8,12,
+                    24,25,26,27,1,5,9,13,
+                    20,21,22,23,2,6,10,14,
+                    16,17,18,19,3,7,11,15,
+                    47,43,39,35,-1,-1,-1,-1,
+                    46,42,38,34,-1,-1,-1,-1,
+                    45,41,37,33,-1,-1,-1,-1,
+                    44,40,36,32,-1,-1,-1,-1]
 
 chains.register_concentrator("NateAE", concentrator.CreateAutoencoder(
     useTransverseADC=True,
@@ -134,7 +148,26 @@ chains.register_concentrator("NateAE", concentrator.CreateAutoencoder(
     useModuleFactor=False,
     bitShiftNormalization=True,
     normByMax=False,
+    linkToGraphMap = linkToGraphMapping,
+    encoderShape=cms.vuint32([1,8,8,1]),
+    cellRemap = cms.vint32(triggerCellRemap),
+    cellRemapNoDuplicates = cms.vint32(triggerCellRemap)
 ))
+
+
+# AE models                                                                                                                                                                                                                       
+
+# AE_8x8_s2_tele_elec = cms.PSet(encoderModelFile = cms.FileInPath('L1Trigger/L1THGCalUtilities/test/AEmodels/8x8_c8_stride2_tele_ele_0PU_7_19/encoder_8x8_c8_S2_tele.pb'),
+#                                decoderModelFile = cms.FileInPath('L1Trigger/L1THGCalUtilities/test/AEmodels/8x8_c8_stride2_tele_ele_0PU_7_19/decoder_8x8_c8_S2_tele.pb'))
+
+# chains.register_concentrator("AutoEncoderStrideTelescopeEle",
+#                              lambda p, i : concentrator.create_autoencoder(p, i,
+#                            modelFiles = cms.VPSet([AE_8x8_s2_tele_elec]),
+#                            linkToGraphMap = cms.vuint32([0,0,0,0,0,0,0,0,0,0,0,0,0,0]),
+#                            encoderShape=cms.vuint32([1,8,8,1]),
+#                            cellRemap = cms.vint32(triggerCellRemap),
+#                            cellRemapNoDuplicates = cms.vint32(triggerCellRemap)))
+
 
 ## BE1
 chains.register_backend1("Dummy", clustering2d.CreateDummy())
