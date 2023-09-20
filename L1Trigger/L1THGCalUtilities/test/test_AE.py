@@ -27,7 +27,7 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(50)
+    input = cms.untracked.int32(20)
 )
 
 # Input source
@@ -102,8 +102,8 @@ chains.register_concentrator("Badae", concentrator.CreateAutoencoder(
 ))
 
 #test models
-autoEncoder_training_2eLinks = cms.PSet(encoderModelFile = cms.FileInPath('/work/submit/nswood/HGCAL/CMSSW_12_5_2_patch1/src/L1Trigger/L1THGCal/data/models/dummy_8_8/encoder_dummy_8_8.pb'),
-                                        decoderModelFile = cms.FileInPath('/work/submit/nswood/HGCAL/CMSSW_12_5_2_patch1/src/L1Trigger/L1THGCal/data/models/dummy_8_8/decoder_dummy_8_8.pb'))
+autoEncoder_training_2eLinks = cms.PSet(encoderModelFile = cms.FileInPath('/work/submit/nswood/HGCAL/CMSSW_12_5_2_patch1/src/L1Trigger/L1THGCal/data/models/dummy_8_8_cond/encoder_dummy_8_8_cond.pb'),
+                                        decoderModelFile = cms.FileInPath('/work/submit/nswood/HGCAL/CMSSW_12_5_2_patch1/src/L1Trigger/L1THGCal/data/models/dummy_8_8_cond/decoder_dummy_8_8_cond.pb'))
 
 # autoEncoder_training_2eLinks = cms.PSet(encoderModelFile = cms.FileInPath('/work/submit/nswood/HGCAL/CMSSW_12_5_2_patch1/src/L1Trigger/L1THGCal/data/models/dummy_AE_4_4_3/encoder_dummy_4_4_3.pb'),
 #                                         decoderModelFile = cms.FileInPath('/work/submit/nswood/HGCAL/CMSSW_12_5_2_patch1/src/L1Trigger/L1THGCal/data/models/dummy_AE_4_4_3/decoder_dummy_4_4_3.pb'))
@@ -150,6 +150,7 @@ chains.register_concentrator("NateAE", concentrator.CreateAutoencoder(
     normByMax=False,
     linkToGraphMap = linkToGraphMapping,
     encoderShape=cms.vuint32([1,8,8,1]),
+    decoderShape=cms.vuint32([1,18]),
     cellRemap = cms.vint32(triggerCellRemap),
     cellRemapNoDuplicates = cms.vint32(triggerCellRemap)
 ))
