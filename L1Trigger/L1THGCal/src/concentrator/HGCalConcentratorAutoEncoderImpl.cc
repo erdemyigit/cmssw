@@ -261,7 +261,7 @@ void HGCalConcentratorAutoEncoderImpl::select(unsigned nLinks,
  // Assign to the second element
 
   
-//   std::vector<tensorflow::Tensor> encoder_outputs;
+  std::vector<tensorflow::Tensor> encoder_outputs;
 // std::map<std::string, tensorflow::Tensor> inputMap;
 // std::cout << encoder_input << std::endl;
 // std::cout << inputTensor2 << std::endl;
@@ -298,18 +298,18 @@ void HGCalConcentratorAutoEncoderImpl::select(unsigned nLinks,
 //     {outputTensorName_encoder_},
 //     &encoder_outputs
 // );
-//   tensorflow::run(session_encoder_.at(graphIndex).get(),
-//                   {{inputTensorName_encoder_,encoder_input},
-//                    {inputCondTensorName_encoder_,inputTensor2}},
-//                   {outputTensorName_encoder_},
-//                   &encoder_outputs);
-  std::cout << "7" << std::endl;
-  
-  std::vector<tensorflow::Tensor> encoder_outputs;
   tensorflow::run(session_encoder_.at(graphIndex).get(),
-                  {{inputTensorName_encoder_, encoder_input}},
+                  {{inputTensorName_encoder_,encoder_input},
+                   {inputCondTensorName_encoder_,inputTensor2}},
                   {outputTensorName_encoder_},
                   &encoder_outputs);
+  std::cout << "7" << std::endl;
+  
+//   std::vector<tensorflow::Tensor> encoder_outputs;
+//   tensorflow::run(session_encoder_.at(graphIndex).get(),
+//                   {{inputTensorName_encoder_, encoder_input}},
+//                   {outputTensorName_encoder_},
+//                   &encoder_outputs);
 
   if (encoder_outputs.empty()) {
     throw cms::Exception("BadInitialization") << "Autoencoder graph returning empty output vector";
