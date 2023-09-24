@@ -77,7 +77,11 @@ private:
 
   std::vector<edm::ParameterSet> modelFilePaths_;
 
+//   tensorflow::Tensor inputTensor2(tensorflow::DT_FLOAT, tensorflow::TensorShape({1, 2}));
+//   std::map<std::string, tensorflow::Tensor> inputMap;
+    
   std::string inputTensorName_encoder_;
+  std::string inputCondTensorName_encoder_;
   std::string outputTensorName_encoder_;
   std::unique_ptr<tensorflow::GraphDef> graphDef_encoder_;
   std::vector<std::unique_ptr<tensorflow::Session>> session_encoder_;
