@@ -1,7 +1,7 @@
 #include "L1Trigger/L1THGCal/interface/concentrator/HGCalConcentratorAutoEncoderImpl.h"
 #include "DataFormats/ForwardDetId/interface/HGCalTriggerDetId.h"
 #include <iomanip>
-std::string inputCondTensorName_encoder_;
+
 
 // Following example of implementing graphloading from here:
 // https://gitlab.cern.ch/mrieger/CMSSW-TensorFlowExamples/-/blob/master/GraphLoading/
@@ -71,7 +71,6 @@ HGCalConcentratorAutoEncoderImpl::HGCalConcentratorAutoEncoderImpl(const edm::Pa
   }
   
   tensorflow::setLogging("0");
-//   std::string inputCondTensorName_encoder_ = "cond";
   for (const auto& modelFilePset : modelFilePaths_) {
     std::string encoderPath = modelFilePset.getParameter<edm::FileInPath>("encoderModelFile").fullPath();
     std::string decoderPath = modelFilePset.getParameter<edm::FileInPath>("decoderModelFile").fullPath();
@@ -138,7 +137,8 @@ void HGCalConcentratorAutoEncoderImpl::select(unsigned nLinks,
   if(triggerTools_.isScintillator(trigCellVecInput[0].detId())){
       return;
   }
-
+  std::cout << "1" << std::endl;
+    fflush(stdout);
   std::array<double, nTriggerCells_> uncompressedCharge;
   std::array<double, nTriggerCells_> compressedCharge;
 
@@ -192,7 +192,7 @@ void HGCalConcentratorAutoEncoderImpl::select(unsigned nLinks,
   modSum = aeInputUtil_.getModSum();
 
   double originalADCsum = 0;
-  double originalCALQsum = 0;
+  float originalCALQsum = 0;
   double originalINPUTsum = 0;
 
   for(unsigned u=0; u<8; ++u){
@@ -202,7 +202,8 @@ void HGCalConcentratorAutoEncoderImpl::select(unsigned nLinks,
       originalINPUTsum += aeInputUtil_.getInput(u,v)/aeInputUtil_.getInputNorm();
     }
   }
-
+  std::cout << "2" << std::endl;
+    fflush(stdout);
   tensorflow::Tensor encoder_input(tensorflow::DT_FLOAT,
                                    {encoderShape_[0], encoderShape_[1], encoderShape_[2], encoderShape_[3]});
   
@@ -214,59 +215,101 @@ void HGCalConcentratorAutoEncoderImpl::select(unsigned nLinks,
   int numCols = encoderShape_[2]; // Number of columns in each 8x8 matrix
 
     // Initialize a vector to store the sum results
-  std::vector<float> sumResults(n);
 
     // Loop over each 8x8 matrix and calculate the sum using std::accumulate
   for (int i = 0; i < n; i++) {
       float* d = encoder_input.flat<float>().data() + i * numRows * numCols;
-
-       
   }
   
   float* d = encoder_input.flat<float>().data();
   for (uint i = 0; i < nInputs_; i++, d++) {
     *d = ae_inputArray[i];
   }
-    
+  // Building conditional tensors
+  tensorflow::Tensor inputTensor2(tensorflow::DT_FLOAT, tensorflow::TensorShape({1, 2}));
+    float* tensorData2 = inputTensor2.flat<float>().data();
+    tensorData2[0] = static_cast<float>(originalCALQsum);
+    tensorData2[1] = static_cast<float>(trigCellVecInput[0].eta());
   int num_elements = encoder_input.flat<float>().size();
 
   int graphIndex = linkToGraphMap_.at(nLinks);
-  for (int i = 0; i < num_elements; i++) {
-        printf("%f\n", d[i]);
-  }
-   tensorflow::Tensor inputTensor2(tensorflow::DT_FLOAT, tensorflow::TensorShape({1, 2}));
-//    tensorflow::Tensor inputTensor2(tensorflow::DT_FLOAT, tensorflow::TensorShape({2}));
+//   for (int i = 0; i < num_elements; i++) {
+//         printf("%f\n", d[i]);
+//   }
+   std::cout << "3" << std::endl;
 
-    // Get a mutable pointer to the tensor's data
-    float* tensorData2 = inputTensor2.flat<float>().data();
-    double firstTC_eta =  trigCellVecInput[0].eta();
-    // Assign the values to the tensor
-    tensorData2[0] = originalCALQsum;
-        tensorData2[1] = firstTC_eta;
-    
 //   std::cout << inputTensorName_encoder_ << std::endl;
 //   std::cout << inputCondTensorName_encoder_ << std::endl;
-    
-//   std::map<std::string, tensorflow::Tensor> inputMap;
+  
+  
 //   inputMap[inputTensorName_encoder_] = encoder_input;
 //   inputMap[inputCondTensorName_encoder_] = inputTensor2;  
   
+  
+//   tensorflow::NamedTensorList inputs = {
+//     {inputTensorName_encoder_, encoder_input},
+//     {inputCondTensorName_encoder_, inputTensor2} // Assuming "cond" is the name of your second input tensor
+//   };
+//   std::cout << "6" << std::endl;
+//   fflush(stdout);
+//   std::cout << inputTensorName_encoder_ << std::endl;
+//   fflush(stdout);
+//   std::cout << inputCondTensorName_encoder_ << std::endl;
+//   fflush(stdout);
     
-  tensorflow::NamedTensorList inputs = {
-    {inputTensorName_encoder_, encoder_input},
-    {inputCondTensorName_encoder_, inputTensor2} // Assuming "cond" is the name of your second input tensor
-  };
-  std::vector<tensorflow::Tensor> encoder_outputs;
-  tensorflow::run(session_encoder_.at(graphIndex).get(),
-                  inputs,
-                  {outputTensorName_encoder_},
-                  &encoder_outputs);
     
+ // Assign to the second element
+
+  
 //   std::vector<tensorflow::Tensor> encoder_outputs;
+// std::map<std::string, tensorflow::Tensor> inputMap;
+// std::cout << encoder_input << std::endl;
+// std::cout << inputTensor2 << std::endl;
+// inputMap[inputTensorName_encoder_] = encoder_input;
+// inputMap[inputCondTensorName_encoder_] = inputTensor2;
+
+// Construct input_args dynamically
+// std::vector<std::pair<std::string, tensorflow::Tensor>> input_args;
+// for (const auto& entry : inputMap) {
+//     input_args.push_back(entry);
+// }
+
+// tensorflow::run(
+//     session_encoder_.at(graphIndex).get(),
+//     input_args,
+//     {outputTensorName_encoder_},
+//     &encoder_outputs
+// );
+// Maybe need to try putting the map as a class object?
+// std::vector<std::pair<std::string, tensorflow::Tensor>> inputVector;
+// inputVector.emplace_back(inputTensorName_encoder_, encoder_input);
+// inputVector.emplace_back(inputCondTensorName_encoder_, inputTensor2);
+//    vector<pair<string, Tensor>> feed_dict = {
+//     {inputTensorName_encoder_, encoder_input},
+//     {inputCondTensorName_encoder_, inputTensor2}
+// };
+// Construct input_args dynamically
+// std::vector<std::pair<std::string, tensorflow::Tensor>> input_args = inputVector;
+
+// tensorflow::run(
+//     session_encoder_.at(graphIndex).get(),
+//     feed_dict,
+//     {inputTensorName_encoder_,inputCondTensorName_encoder_}
+//     {outputTensorName_encoder_},
+//     &encoder_outputs
+// );
 //   tensorflow::run(session_encoder_.at(graphIndex).get(),
-//                   {{inputTensorName_encoder_, encoder_input}},
+//                   {{inputTensorName_encoder_,encoder_input},
+//                    {inputCondTensorName_encoder_,inputTensor2}},
 //                   {outputTensorName_encoder_},
 //                   &encoder_outputs);
+  std::cout << "7" << std::endl;
+  
+  std::vector<tensorflow::Tensor> encoder_outputs;
+  tensorflow::run(session_encoder_.at(graphIndex).get(),
+                  {{inputTensorName_encoder_, encoder_input}},
+                  {outputTensorName_encoder_},
+                  &encoder_outputs);
 
   if (encoder_outputs.empty()) {
     throw cms::Exception("BadInitialization") << "Autoencoder graph returning empty output vector";
@@ -275,7 +318,8 @@ void HGCalConcentratorAutoEncoderImpl::select(unsigned nLinks,
   //Here we can add conditioning to CMSSW
   
     
-  
+  std::cout << "8" << std::endl;
+    fflush(stdout);
   d = encoder_outputs[0].flat<float>().data();
   for (int i = 0; i < encoder_outputs[0].NumElements(); i++, d++) {
     ae_encodedLayer_[i] = *d;
@@ -285,7 +329,8 @@ void HGCalConcentratorAutoEncoderImpl::select(unsigned nLinks,
     }
   }
     
-  
+  std::cout << "9" << std::endl;
+    fflush(stdout);
   tensorflow::Tensor decoder_input(tensorflow::DT_FLOAT, {decoderShape_[0], decoderShape_[1]});
   d = decoder_input.flat<float>().data();
   for (int i = 0; i < nEncodedLayerNodes_; i++, d++) {
@@ -299,7 +344,8 @@ tensorflow::TensorShape decoder_input_shape = decoder_input.shape();
 // for (int i = 0; i < decoder_input_shape.dims(); i++) {
 //     std::cout << "Dimension " << i << ": " << decoder_input_shape.dim_size(i) << std::endl;
 // }
-
+  std::cout << "10" << std::endl;
+    fflush(stdout);
   std::vector<tensorflow::Tensor> decoder_outputs;
   tensorflow::run(session_decoder_.at(graphIndex).get(),
                   {{inputTensorName_decoder_, decoder_input}},
@@ -315,6 +361,8 @@ tensorflow::TensorShape decoder_input_shape = decoder_input.shape();
         ae_outputArray[i] = *d;
     }
   }
+  std::cout << "11" << std::endl;
+    fflush(stdout);
   // Add data back into trigger cells
   if (modSum > 0) {
     //get detID for everything but cell, take first entry detID and subtract off cellU and cellV contribution
@@ -327,14 +375,16 @@ tensorflow::TensorShape decoder_input_shape = decoder_input.shape();
     int waferV = id.waferV();
     int cellU = id.triggerCellU();
     int cellV = id.triggerCellV();
-
+    std::cout << "12" << std::endl;
+      fflush(stdout);
 
     //use first TC to find mipPt conversions to Et and ADC
     float mipPtToEt_conv = trigCellVecInput[0].et() / trigCellVecInput[0].mipPt();
     float mipToADC_conv = trigCellVecInput[0].hwPt() / (trigCellVecInput[0].mipPt() * cosh(trigCellVecInput[0].eta()));
 
     double outputSum = 0;
-
+    std::cout << "13" << std::endl;
+      fflush(stdout);
     for (int i = 0; i < nTriggerCells_; i++) {
         cellU = aeInputUtil_.getU(i);
         cellV = aeInputUtil_.getV(i);
@@ -345,11 +395,14 @@ tensorflow::TensorShape decoder_input_shape = decoder_input.shape();
             outputSum += ae_outputArray[i];
         }
     }
+    std::cout << "14" << std::endl;
+      fflush(stdout);
     double renormalizationFactor = 1.;
     if (preserveModuleSum_ && outputSum > 0) {
       renormalizationFactor = modSum / outputSum;
     }
-
+    std::cout << "15" << std::endl;
+      fflush(stdout);
     //unsigned aeOutput2d[8][8] = {};
     //unsigned aeOutputCALQ2d[8][8] = {};
     //unsigned aeOutputADC2d[8][8] = {};
@@ -357,6 +410,8 @@ tensorflow::TensorShape decoder_input_shape = decoder_input.shape();
     double finalCALQsum = 0;
     double finalINPUTsum = 0;
     //unsigned anID;
+    std::cout << "16" << std::endl;
+      fflush(stdout);
     for (int i = 0; i < nTriggerCells_; i++) {
       if (ae_outputArray[i] > 0) {
         cellU = aeInputUtil_.getU(i);
@@ -399,6 +454,8 @@ tensorflow::TensorShape decoder_input_shape = decoder_input.shape();
         trigCellVecOutput.push_back(triggerCell);
       }
     }
+    std::cout << "17" << std::endl;
+      fflush(stdout);
     //printf("%d %d %d %d\n", useModuleFactor_, bitShiftNormalization_, useTransverseADC_, normByMax_);
     //printf("%d\n", triggerTools_.getTriggerGeometry()->getModuleFromTriggerCell(anID));
     //printf("'input' sum: %0.3f -> %0.3f\n", originalINPUTsum, finalINPUTsum);
@@ -415,7 +472,7 @@ tensorflow::TensorShape decoder_input_shape = decoder_input.shape();
     //aeInputUtil_.print2d(aeInput2d);
     //printf("AE output\n");
     //aeInputUtil_.print2d(aeOutput2d);
-
+    
     if (saveEncodedValues_) {
       id = HGCalTriggerDetId(subdet, zp, type, layer, waferU, waferV, 0, 0);
       for (int i = 0; i < nEncodedLayerNodes_; i++) {
@@ -423,5 +480,7 @@ tensorflow::TensorShape decoder_input_shape = decoder_input.shape();
         ae_encodedLayer_Output.push_back(encodedLayerData);
       }
     }
+    std::cout << "18" << std::endl;
+      fflush(stdout);
   }
 }
