@@ -11,7 +11,7 @@ from http.client import HTTPException
 from multiprocessing import Process
 import copy
 
-from CRABClient.UserUtilities import config, ClientException, getUsernameFromCRIC
+from CRABClient.UserUtilities import config, ClientException#, getUsernameFromCRIC
 from CRABAPI.RawCommand import crabCommand
 from CRABClient.ClientExceptions import ClientException
 
@@ -19,10 +19,10 @@ sys.path.append(".")
 from production_tag import production_tag # Get from a text file
 # Get from git tag (tbd)
 #production_tag = "vTEST9" # Specify by hand
-requestname_base = "srothman"
+requestname_base = "nwoodwar"
 output_site = "T3_US_FNALLPC"
-output_lfn_base = "/store/group/lpcpfnano/srothman/{production_tag}".format(
-                                                    username=getUsernameFromCRIC(), 
+output_lfn_base = "/store/user/nwoodwar/{production_tag}".format(
+                                                    
                                                     production_tag=production_tag)
 
 if __name__ == '__main__':

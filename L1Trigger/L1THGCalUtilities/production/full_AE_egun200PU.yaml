@@ -4,10 +4,10 @@ defaults:
   reco_version: UL
   year: Phase2C17I13M9
   globaltag: auto:phase2_realistic_T21
-  pset: $CMSSW_BASE/src/L1Trigger/L1THGCalUtilities/test/test_AE.py
+  pset: $CMSSW_BASE/src/L1Trigger/L1THGCalUtilities/test/test_CAE.py
   allowInvalid: False
   unitsPerJob: 1
-    #totalUnits: 2
+#   totalUnits: -1
 
 samples:
   EGun_200PU: 

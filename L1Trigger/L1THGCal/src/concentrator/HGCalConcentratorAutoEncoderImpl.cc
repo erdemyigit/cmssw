@@ -1,6 +1,7 @@
 #include "L1Trigger/L1THGCal/interface/concentrator/HGCalConcentratorAutoEncoderImpl.h"
 #include "DataFormats/ForwardDetId/interface/HGCalTriggerDetId.h"
 #include <iomanip>
+#include <cmath> 
 
 // Following example of implementing graphloading from here:
 // https://gitlab.cern.ch/mrieger/CMSSW-TensorFlowExamples/-/blob/master/GraphLoading/
@@ -31,9 +32,11 @@ HGCalConcentratorAutoEncoderImpl::HGCalConcentratorAutoEncoderImpl(const edm::Pa
   // find total size of the expected input shape
   nInputs_ = 1;
   for (const auto& i : encoderShape_) {
+//     printf("%d\n", i);
     nInputs_ *= i;
   }
-
+  printf("%d\n", nInputs_);
+  
   // check the size of the inputs shapes
   if (encoderShape_.size() != encoderTensorDims_) {
     throw cms::Exception("BadInitialization")
@@ -67,7 +70,11 @@ HGCalConcentratorAutoEncoderImpl::HGCalConcentratorAutoEncoderImpl(const edm::Pa
     //extract encoder tenser names from first graph, check that rest of the names are consistent
     if (modelFilePset == modelFilePaths_.front()) {
       inputTensorName_encoder_ = graphDef_encoder_.get()->node(0).name();
+      //Could be it (print this out)
+      inputCondTensorName_encoder_ = graphDef_encoder_.get()->node(1).name();
+      
       outputTensorName_encoder_ = graphDef_encoder_.get()->node(graphDef_encoder_.get()->node_size() - 1).name();
+        
       inputTensorName_decoder_ = graphDef_decoder_.get()->node(0).name();
       outputTensorName_decoder_ = graphDef_decoder_.get()->node(graphDef_decoder_.get()->node_size() - 1).name();
     } else {
@@ -123,6 +130,9 @@ void HGCalConcentratorAutoEncoderImpl::select(
 
   std::vector<double> ae_inputArray(nInputs_, 0);
   std::vector<double> ae_outputArray(nInputs_, 0);
+  
+  //Nate Added
+  std::vector<double> ae_condArray(5, 0);
 
   //reset inputs to 0 to account for zero suppressed trigger cells
   double modSum = 0;
@@ -136,7 +146,13 @@ void HGCalConcentratorAutoEncoderImpl::select(
   // values of -1 for the number of bits used to keep full precision, 
   // in which case the MaxIntSize variables are not used
   // NB from Simon: I haven't touched this
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+
   double outputMaxIntSize = 1;
+
+  #pragma GCC diagnostic pop
+   
   if (bitsPerOutput > 0)
     outputMaxIntSize = 1 << nDecimalBits;
   double outputMaxIntSizeGlobal = 1;
@@ -148,10 +164,16 @@ void HGCalConcentratorAutoEncoderImpl::select(
       return;
   }
 
+  
+  
+    
+  
   for (const auto& trigCell : trigCellVecInput) {
     HGCalTriggerDetId id(trigCell.detId());
     uint cellu = id.triggerCellU();
     uint cellv = id.triggerCellV();
+    
+    
     int inputIndex = aeInputUtil_.getAEIndex(cellu, cellv);
     if (inputIndex < 0) {
       throw cms::Exception("BadInitialization")
@@ -165,7 +187,9 @@ void HGCalConcentratorAutoEncoderImpl::select(
     if(verbose_){
         printf("tc (%u, %u) has ADC %u\n", cellu, cellv, aeInputUtil_.getADC(inputIndex));
     }
+  
   }
+  
   modSum = aeInputUtil_.getModSum();
 
   double originalADCsum = 0;
@@ -179,10 +203,40 @@ void HGCalConcentratorAutoEncoderImpl::select(
       originalINPUTsum += aeInputUtil_.getInput(u,v)/aeInputUtil_.getInputNorm();
     }
   }
-
+//   ae_condArray[4] = originalCALQsum;
+//   ae_condArray[0] = trigCellVecInput[0].eta();
+  
   tensorflow::Tensor encoder_input(tensorflow::DT_FLOAT,
                                    {encoderShape_[0], encoderShape_[1],
                                    encoderShape_[2], encoderShape_[3]});
+    
+    
+//   std::cout << "Value of inputTensorName_encoder_: " << inputTensorName_encoder_ << std::endl;
+//   std::cout << "Value of inputCondTensorName_encoder_: " << inputCondTensorName_encoder_ << std::endl;
+//   std::cout << "Value of outputTensorName_encoder_: " << outputTensorName_encoder_ << std::endl;
+  printf("\n originalCALQsum \n");
+  printf("%0.3f ", originalCALQsum);
+  printf("\n originalADCsum \n");
+  printf("%0.3f ", originalADCsum);
+  printf("\n originalINPUTsum \n");  
+  printf("%0.3f ", originalINPUTsum);
+      
+//   printf("Cond Data\n");
+    
+//   HGCalTriggerDetId id(trigCellVecInput.at(0).detId());
+//   int type = id.type();
+//   int layer = id.layer();
+//   int waferU = id.waferU();
+//   int waferV = id.waferV();
+  
+//   // Try not filling with anything
+//   ae_condArray[1] = waferU;
+//   ae_condArray[2] = waferV;
+//   ae_condArray[3] = type;
+//   tensorflow::Tensor encoder_cond(tensorflow::DT_FLOAT,
+//                                    {encoderShape_[0], encoderShape_[1],
+//                                    encoderShape_[2], encoderShape_[3]});
+  
 
   if(verbose_){
       printf("INPUT\n");
@@ -194,39 +248,128 @@ void HGCalConcentratorAutoEncoderImpl::select(
         }
       }
   }
+    if(verbose_){
+      printf("CALQ INPUT\n");
+      for(unsigned u=0; u<8; ++u){
+        for(unsigned v=0; v<8; ++v){
+          printf("%d ", aeInputUtil_.getCALQ(u,v));
+        }
+      printf("\n");
+      }
+    }
+  
 
+  
+                                   
   if(!skipAE_){//run AE
       int graphIndex = linkToGraphMap_.at(nLinks);
-
+      
+      //Nate Modified
       std::vector<tensorflow::Tensor> encoder_outputs;
+      
+
+      
+
       tensorflow::run(session_encoder_.at(graphIndex).get(),
-                      {{inputTensorName_encoder_, encoder_input}},
+                      {{inputTensorName_encoder_, encoder_input}
+                       },
                       {outputTensorName_encoder_},
                       &encoder_outputs);
+      
 
       if (encoder_outputs.empty()) {
         throw cms::Exception("BadInitialization") << "Autoencoder graph returning empty output vector";
       }
+//       if(verbose_){
+//           printf("LATENT SPACE\n");
+//           for (int i = 0; i < encoder_outputs[0].NumElements(); i++) {
+//             printf("%f\n", encoder_outputs[0].flat<float>().data()[i]);
+//           }
+//       }
+      if(verbose_){
+          
+          printf("bitsPerOutput\n");
+          printf("%d\n",bitsPerOutput);
+          printf("outputMaxIntSize\n");
+          printf("%f\n",outputMaxIntSize);
+          printf("outputSaturationValue\n");
+          printf("%f\n",outputSaturationValue);
+          printf("nDecimalBits\n");
+          printf("%d\n",nDecimalBits);
+          printf("nIntegerBits\n");
+          printf("%d\n",nIntegerBits);
+           
 
+          
+          }
+      
       for (int i = 0; i < encoder_outputs[0].NumElements(); i++) {
         ae_encodedLayer_[i] = encoder_outputs[0].flat<float>().data()[i];
         //truncate the encoded layer bits
+      
         if (bitsPerOutput > 0 && maxBitsPerOutput_ > 0) {
           ae_encodedLayer_[i] = std::min(std::floor(ae_encodedLayer_[i] * outputMaxIntSize) / outputMaxIntSize, outputSaturationValue);
         }
       }
+      
+//       for (int i = 0; i < encoder_outputs[0].NumElements(); i++) {
+//         ae_encodedLayer_[i] = encoder_outputs[0].flat<float>().data()[i];
+//         //truncate the encoded layer bits
+//         if (bitsPerOutput > 0 && maxBitsPerOutput_ > 0) {
+//           ae_encodedLayer_[i] = ae_encodedLayer_[i];
+//         }
+//       }
 
       tensorflow::Tensor decoder_input(tensorflow::DT_FLOAT, 
               {decoderShape_[0], decoderShape_[1]});
+      std::fill_n(decoder_input.flat<float>().data(), decoderShape_[1], 1.0f);
       for (int i = 0; i < nEncodedLayerNodes_; i++) {
         decoder_input.flat<float>().data()[i] = ae_encodedLayer_[i];
       }
+      
+      if (decoderShape_[1] > 16){
+          printf("\nConditional Info\n");
+          fflush(stdout);
+          HGCalTriggerDetId id(trigCellVecInput.at(0).detId());
+          decoder_input.flat<float>().data()[16] = trigCellVecInput[0].eta()/3.1;
+          decoder_input.flat<float>().data()[17] = id.waferV()/12;
+          decoder_input.flat<float>().data()[18] = id.waferU()/12;
+          int wafertype0 = 0;
+          int wafertype1 = 0;
+          int wafertype2 = 0;
+          if (id.type() == 0) {
+                wafertype0 = 1;
+            } else if (id.type() == 1) {
+                wafertype1 = 1;
+            } else if (id.type() == 2) {
+                wafertype2 = 1;
+            }
+          
 
+          decoder_input.flat<float>().data()[19] = wafertype0;
+          decoder_input.flat<float>().data()[20] = wafertype1;
+          decoder_input.flat<float>().data()[21] = wafertype2;
+          decoder_input.flat<float>().data()[22] = log(originalCALQsum+1);
+          decoder_input.flat<float>().data()[23] = (id.layer()-1)/(47-1);
+          printf("INPUT\n");
+          for (unsigned i = 0; i < decoderShape_[1]; ++i) {
+            
+            printf("%0.3f \n", decoder_input.flat<float>().data()[i]);
+            
+          }
+          fflush(stdout);
+          printf("END OF Conditionals \n");
+      }
+      fflush(stdout);
+      
+         
       std::vector<tensorflow::Tensor> decoder_outputs;
       tensorflow::run(session_decoder_.at(graphIndex).get(),
                       {{inputTensorName_decoder_, decoder_input}},
                       {outputTensorName_decoder_},
                       &decoder_outputs);
+      printf("Past Decoder\n");
+      fflush(stdout);
       for (uint i = 0; i < nInputs_; i++) {
         ae_outputArray[i] = decoder_outputs[0].flat<float>().data()[i];
       }
@@ -259,22 +402,25 @@ void HGCalConcentratorAutoEncoderImpl::select(
     int cellU = id.triggerCellU();
     int cellV = id.triggerCellV();
 
+
+
     //use first TC to find mipPt conversions to Et and ADC
     float mipPtToEt_conv = trigCellVecInput[0].et() / trigCellVecInput[0].mipPt();
     float mipToADC_conv = trigCellVecInput[0].hwPt() / (trigCellVecInput[0].mipPt() * cosh(trigCellVecInput[0].eta()));
-
     double outputSum = 0;
-
+    fflush(stdout);  
+     
+        
     for (unsigned i = 0; i < nInputs_; i++) {
+        fflush(stdout);
         cellU = aeInputUtil_.getUtc(i);
         cellV = aeInputUtil_.getVtc(i);
-        
+    
+        fflush(stdout);
         if(cellU<0 || cellV<0){
             continue;
         }
-
         HGCalTriggerDetId id(subdet, zp, type, layer, waferU, waferV, cellU, cellV);
-
         if(triggerTools_.getTriggerGeometry()->validTriggerCell(id)){
             outputSum += ae_outputArray[i];
         }
@@ -287,7 +433,6 @@ void HGCalConcentratorAutoEncoderImpl::select(
     double finalADCsum = 0;
     double finalCALQsum = 0;
     double finalINPUTsum = 0;
-
     for (unsigned i = 0; i < nInputs_; i++) {
       if (ae_outputArray[i] > 0) {
         cellU = aeInputUtil_.getUtc(i);
@@ -295,21 +440,18 @@ void HGCalConcentratorAutoEncoderImpl::select(
         if(cellU<0 || cellV<0){
             continue;
         }
-
+          
         HGCalTriggerDetId id(subdet, zp, type, layer, waferU, waferV, cellU, cellV);
-
         GlobalPoint point = triggerTools_.getTCPosition(id);
-
+          
         double CALQ = ae_outputArray[i] * renormalizationFactor;
         double adc = aeInputUtil_.CALQtoADC(CALQ, i);
 
         double mipPt = adc / mipToADC_conv / cosh(point.eta());
         double et = mipPt * mipPtToEt_conv;
-
         finalINPUTsum += ae_outputArray[i];
         finalCALQsum += CALQ;
         finalADCsum += adc;
-
         if (adc < zeroSuppresionThreshold_)
           continue;
 
@@ -320,6 +462,7 @@ void HGCalConcentratorAutoEncoderImpl::select(
             printf("tc (%u, %u) has ADC %f\n", cellU, cellV, adc);
         }
         l1t::HGCalTriggerCell triggerCell(reco::LeafCandidate::LorentzVector(), adc, 0, 0, 0, id);
+          
         //Keep the pre-autoencoder charge for this cell
         triggerCell.setUncompressedCharge(uncompressedCharge[i]);
         triggerCell.setCompressedCharge(compressedCharge[i]);
@@ -333,13 +476,14 @@ void HGCalConcentratorAutoEncoderImpl::select(
         trigCellVecOutput.push_back(triggerCell);
       }
     }
+    
 
     if (saveEncodedValues_) {
       id = HGCalTriggerDetId(subdet, zp, type, layer, waferU, waferV, 0, 0);
       for (int i = 0; i < nEncodedLayerNodes_; i++) {
         l1t::HGCalConcentratorData encodedLayerData(ae_encodedLayer_[i] * outputMaxIntSizeGlobal, i, id);
         ae_encodedLayer_Output.push_back(encodedLayerData);
-      }
+          }
     }
     if(verbose_){
       printf("------------------------------------------------------------\n");

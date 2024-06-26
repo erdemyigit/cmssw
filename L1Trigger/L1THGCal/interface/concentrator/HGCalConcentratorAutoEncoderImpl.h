@@ -56,6 +56,8 @@ private:
 
   std::string inputTensorName_encoder_;
   std::string outputTensorName_encoder_;
+  std::string inputCondTensorName_encoder_;
+
   std::unique_ptr<tensorflow::GraphDef> graphDef_encoder_;
   std::vector<std::unique_ptr<tensorflow::Session>> session_encoder_;
 
@@ -84,6 +86,7 @@ private:
   AEinputUtil aeInputUtil_;
 
   int verbose_;
+  
 };
 
 #endif
