@@ -19,9 +19,9 @@ sys.path.append(".")
 from production_tag import production_tag # Get from a text file
 # Get from git tag (tbd)
 #production_tag = "vTEST9" # Specify by hand
-requestname_base = "nwoodwar"
+requestname_base = "eertorer"
 output_site = "T3_US_FNALLPC"
-output_lfn_base = "/store/user/nwoodwar/{production_tag}".format(
+output_lfn_base = "/store/user/eertorer/{production_tag}".format(
                                                     
                                                     production_tag=production_tag)
 

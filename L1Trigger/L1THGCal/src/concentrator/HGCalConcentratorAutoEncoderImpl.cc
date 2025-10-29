@@ -220,6 +220,8 @@ void HGCalConcentratorAutoEncoderImpl::select(
   printf("%0.3f ", originalADCsum);
   printf("\n originalINPUTsum \n");  
   printf("%0.3f ", originalINPUTsum);
+  printf("\n modSum \n");
+  printf("%0.3f ", modSum);
       
 //   printf("Cond Data\n");
     
@@ -349,8 +351,10 @@ void HGCalConcentratorAutoEncoderImpl::select(
           decoder_input.flat<float>().data()[19] = wafertype0;
           decoder_input.flat<float>().data()[20] = wafertype1;
           decoder_input.flat<float>().data()[21] = wafertype2;
+          //decoder_input.flat<float>().data()[22] = log(originalINPUTsum+1);
           decoder_input.flat<float>().data()[22] = log(originalCALQsum+1);
-          decoder_input.flat<float>().data()[23] = (id.layer()-1)/(47-1);
+          // decoder_input.flat<float>().data()[23] = (id.layer()-1)/(47-1); 
+	  decoder_input.flat<float>().data()[23] = id.layer();
           printf("INPUT\n");
           for (unsigned i = 0; i < decoderShape_[1]; ++i) {
             

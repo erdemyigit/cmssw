@@ -27,15 +27,14 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(5)
+    input = cms.untracked.int32(10)
 )
 
 # Input source
 process.source = cms.Source("PoolSource",
     #fileNames = cms.untracked.vstring('file:DoubleElectron_FlatPt-1To100-gun_noPU.root'),
-    fileNames = cms.untracked.vstring('/store/mc/Phase2Fall22DRMiniAOD/DoubleElectron_FlatPt-1To100-gun/GEN-SIM-DIGI-RAW-MINIAOD/noPU_125X_mcRun4_realistic_v2-v1/2550000/066944a3-a061-42ac-ba45-9faadb46407a.root'),
-                            
-
+    #fileNames = cms.untracked.vstring('/store/mc/Phase2Fall22DRMiniAOD/DoubleElectron_FlatPt-1To100-gun/GEN-SIM-DIGI-RAW-MINIAOD/noPU_125X_mcRun4_realistic_v2-v1/2550000/066944a3-a061-42ac-ba45-9faadb46407a.root'),
+    fileNames = cms.untracked.vstring('/store/mc/Phase2Fall22DRMiniAOD/DoubleElectron_FlatPt-1To100-gun/GEN-SIM-DIGI-RAW-MINIAOD/PU200_125X_mcRun4_realistic_v2-v1/30000/65ce4640-c197-4c07-9fa4-cb505ab72738.root'),                       
     inputCommands=cms.untracked.vstring(
         'keep *',
         'drop l1tTkPrimaryVertexs_L1TkPrimaryVertex__RECO',
@@ -158,71 +157,60 @@ chains.register_concentrator("Badae", concentrator.CreateAutoencoder(
 #     decoderShape=cms.vuint32([1,24]),
 # ))
 
-eLinkCAE_1 = cms.PSet(encoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/CAE_6_23_biased_CMSSW/model_1_eLinks/encoder_vanilla_AE.pb'),
-                                  decoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/CAE_6_23_biased_CMSSW/model_1_eLinks/decoder_vanilla_AE.pb'))
-
-eLinkCAE_2 = cms.PSet(encoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/CAE_6_23_biased_CMSSW/model_2_eLinks/encoder_vanilla_AE.pb'),
-                                  decoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/CAE_6_23_biased_CMSSW/model_2_eLinks/decoder_vanilla_AE.pb'))
-
-eLinkCAE_3 = cms.PSet(encoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/CAE_6_23_biased_CMSSW/model_3_eLinks/encoder_vanilla_AE.pb'),
-                                  decoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/CAE_6_23_biased_CMSSW/model_3_eLinks/decoder_vanilla_AE.pb'))
-
-eLinkCAE_4 = cms.PSet(encoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/CAE_6_23_biased_CMSSW/model_4_eLinks/encoder_vanilla_AE.pb'),
-                                  decoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/CAE_6_23_biased_CMSSW/model_4_eLinks/decoder_vanilla_AE.pb'))
-
-eLinkCAE_5 = cms.PSet(encoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/CAE_6_23_biased_CMSSW/model_5_eLinks/encoder_vanilla_AE.pb'),
-                                  decoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/CAE_6_23_biased_CMSSW/model_5_eLinks/decoder_vanilla_AE.pb'))
-
-eLinkCAE_6 = cms.PSet(encoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/CAE_6_23_biased_CMSSW/model_6_eLinks/encoder_vanilla_AE.pb'),
-                                  decoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/CAE_6_23_biased_CMSSW/model_6_eLinks/decoder_vanilla_AE.pb'))
-
-eLinkCAE_7 = cms.PSet(encoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/CAE_6_23_biased_CMSSW/model_7_eLinks/encoder_vanilla_AE.pb'),
-                                  decoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/CAE_6_23_biased_CMSSW/model_7_eLinks/decoder_vanilla_AE.pb'))
-
-eLinkCAE_8 = cms.PSet(encoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/CAE_6_23_biased_CMSSW/model_8_eLinks/encoder_vanilla_AE.pb'),
-                                  decoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/CAE_6_23_biased_CMSSW/model_8_eLinks/decoder_vanilla_AE.pb'))
-
-eLinkCAE_9 = cms.PSet(encoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/CAE_6_23_biased_CMSSW/model_9_eLinks/encoder_vanilla_AE.pb'),
-                                  decoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/CAE_6_23_biased_CMSSW/model_9_eLinks/decoder_vanilla_AE.pb'))
-
-eLinkCAE_10 = cms.PSet(encoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/CAE_6_23_biased_CMSSW/model_10_eLinks/encoder_vanilla_AE.pb'),
-                                  decoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/CAE_6_23_biased_CMSSW/model_10_eLinks/decoder_vanilla_AE.pb'))
-
-eLinkCAE_11 = cms.PSet(encoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/CAE_6_23_biased_CMSSW/model_11_eLinks/encoder_vanilla_AE.pb'),
-                                  decoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/CAE_6_23_biased_CMSSW/model_11_eLinks/decoder_vanilla_AE.pb'))
+#eLinkCAE_3 = cms.PSet(encoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/Tele_CAE_biased_90_CMSSW/model_3_bits/encoder_vanilla_AE.pb'),
+#                                  decoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/Tele_CAE_biased_90_CMSSW/model_3_bits/decoder_vanilla_AE.pb'))
+#
+#eLinkCAE_5 = cms.PSet(encoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/Tele_CAE_biased_90_CMSSW/model_5_bits/encoder_vanilla_AE.pb'),
+#                                  decoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/Tele_CAE_biased_90_CMSSW/model_5_bits/decoder_vanilla_AE.pb'))
+#
+#eLinkCAE_7 = cms.PSet(encoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/Tele_CAE_biased_90_CMSSW/model_7_bits/encoder_vanilla_AE.pb'),
+#                                  decoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/Tele_CAE_biased_90_CMSSW/model_7_bits/decoder_vanilla_AE.pb'))
+#
+#eLinkCAE_9 = cms.PSet(encoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/Tele_CAE_biased_90_CMSSW/model_9_bits/encoder_vanilla_AE.pb'),
+#                                  decoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/Tele_CAE_biased_90_CMSSW/model_9_bits/decoder_vanilla_AE.pb'))
 
 
 
-chains.register_concentrator("Newelinkbiased", concentrator.CreateAutoencoder(
-    useTransverseADC=True,
-    skipAE=False,
-    modelFiles = [eLinkCAE_1,eLinkCAE_2,eLinkCAE_3,eLinkCAE_4,eLinkCAE_5,eLinkCAE_6,eLinkCAE_7,
-                 eLinkCAE_8,eLinkCAE_9,eLinkCAE_10,eLinkCAE_11],
-    useModuleFactor=False,
-    bitShiftNormalization=True,
-    normByMax=False,
-    verbose =True, 
-    linkToGraphMap = cms.vuint32([0,0,1,2,3,4,5,6,7,8,9,10,10,10]),
-    encoderShape=cms.vuint32([1,8,8,1]),
-    decoderShape=cms.vuint32([1,24]),
-))
+#chains.register_concentrator("Papermodel", concentrator.CreateAutoencoder(
+#    useTransverseADC=True,
+#    skipAE=False,
+#    modelFiles = [eLinkCAE_3,eLinkCAE_5,eLinkCAE_7,eLinkCAE_9],
+#    useModuleFactor=False,
+#    bitShiftNormalization=True,
+#    normByMax=False,
+#    verbose =True, 
+#    linkToGraphMap = cms.vuint32([0,0,0,1,2,3,3,3,3,3,3,3,3,3]), #Edited this to match the number of bits
+#    encoderShape=cms.vuint32([1,8,8,1]),
+#    decoderShape=cms.vuint32([1,24]), #If you want to change the model you have to change the decoder shape but not the encoder shape (encoder shape is already written on the ASIC
+#))
 
 
 #
 
-eLinkCAE_2 = cms.PSet(encoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/CAE_6_24_biased_old_CMSSW/model_2_eLinks/encoder_vanilla_AE.pb'),
-                                  decoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/CAE_6_24_biased_old_CMSSW/model_2_eLinks/decoder_vanilla_AE.pb'))
+#L1Trigger/L1THGCal/data/models/elink_90_20_files_500_epoch/CMSSW_models/model_2_eLinks
 
-eLinkCAE_3 = cms.PSet(encoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/CAE_6_24_biased_old_CMSSW/model_3_eLinks/encoder_vanilla_AE.pb'),
-                                  decoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/CAE_6_24_biased_old_CMSSW/model_3_eLinks/decoder_vanilla_AE.pb'))
+#redo_tele_90_latest/CMSSW_models/model_2_eLinks/encoder_vanilla_AE.pb
 
-eLinkCAE_4 = cms.PSet(encoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/CAE_6_24_biased_old_CMSSW/model_4_eLinks/encoder_vanilla_AE.pb'),
-                                  decoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/CAE_6_24_biased_old_CMSSW/model_4_eLinks/decoder_vanilla_AE.pb'))
+eLinkCAE_2 = cms.PSet(encoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/AE_hyperband_8_15/best_model_eLink_2_post_seed_variation_for_CMSSW/encoder_search.pb'),                                  decoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/AE_hyperband_8_15/best_model_eLink_2_post_seed_variation_for_CMSSW/decoder_search.pb')) 
+eLinkCAE_3 = cms.PSet(encoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/AE_hyperband_8_15/best_model_eLink_3_post_seed_variation_for_CMSSW/encoder_search.pb'),                                  decoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/AE_hyperband_8_15/best_model_eLink_3_post_seed_variation_for_CMSSW/decoder_search.pb'))
+eLinkCAE_4 = cms.PSet(encoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/AE_hyperband_8_15/best_model_eLink_4_post_seed_variation_for_CMSSW/encoder_search.pb'),                                  decoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/AE_hyperband_8_15/best_model_eLink_4_post_seed_variation_for_CMSSW/decoder_search.pb'))
+eLinkCAE_5 = cms.PSet(encoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/AE_hyperband_8_15/best_model_eLink_5_post_seed_variation_for_CMSSW/encoder_search.pb'),                                  decoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/AE_hyperband_8_15/best_model_eLink_5_post_seed_variation_for_CMSSW/decoder_search.pb'))
 
-eLinkCAE_5 = cms.PSet(encoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/CAE_6_24_biased_old_CMSSW/model_5_eLinks/encoder_vanilla_AE.pb'),
-                                  decoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/CAE_6_24_biased_old_CMSSW/model_5_eLinks/decoder_vanilla_AE.pb'))
+chains.register_concentrator("AEv1", concentrator.CreateAutoencoder(
+    useTransverseADC=True,
+    skipAE=False,
+    modelFiles = [eLinkCAE_2,eLinkCAE_3,eLinkCAE_4,eLinkCAE_5],
+    useModuleFactor=False,
+    bitShiftNormalization=True,
+    normByMax=False,
+    verbose =True, 
+    linkToGraphMap = cms.vuint32([0,0,0,1,1,2,2,3,3,3,3,3,3,3]),
+    encoderShape=cms.vuint32([1,8,8,1]),
+    decoderShape=cms.vuint32([1,16]),
+))
 
-chains.register_concentrator("Oldtelecae", concentrator.CreateAutoencoder(
+
+chains.register_concentrator("AEv2", concentrator.CreateAutoencoder(
     useTransverseADC=True,
     skipAE=False,
     modelFiles = [eLinkCAE_2,eLinkCAE_3,eLinkCAE_4,eLinkCAE_5],
@@ -232,7 +220,7 @@ chains.register_concentrator("Oldtelecae", concentrator.CreateAutoencoder(
     verbose =True, 
     linkToGraphMap = cms.vuint32([0,0,0,1,2,3,3,3,3,3,3,3,3,3]),
     encoderShape=cms.vuint32([1,8,8,1]),
-    decoderShape=cms.vuint32([1,24]),
+    decoderShape=cms.vuint32([1,16]),
 ))
 
 
@@ -250,7 +238,7 @@ chains.register_selector("Dummy", selectors.CreateDummy())
 
 # standard_concentrators = ['eLinkTele']
 
-standard_concentrators = ['Threshold0', 'Threshold135','Newelinkbiased','Oldtelecae']
+standard_concentrators = ['AEv1','AEv2','Threshold0','Threshold135']
 
 
 # standard_concentrators = ['eLinkemd']
