@@ -40,7 +40,6 @@ def create_dbscan(process, inputs,
             )
     return producer
 
-
 class CreateHistoMax(object):
     def __init__(self,
             distance=histoMax_C3d_clustering_params.dR_multicluster,
@@ -48,11 +47,14 @@ class CreateHistoMax(object):
             nBins_X2=histoMax_C3d_seeding_params.nBins_X2_histo_multicluster,
             binSumsHisto=histoMax_C3d_seeding_params.binSumsHisto,
             seed_threshold=histoMax_C3d_seeding_params.threshold_histo_multicluster,
+            seeds_norm_by_area=histoMax_C3d_seeding_params.seeds_norm_by_area,
             shape_threshold=histoMax_C3d_clustering_params.shape_threshold,
             shape_distance=histoMax_C3d_clustering_params.shape_distance,
             ):
         self.clustering_parameters = histoMax_C3d_clustering_params.clone()
-        self.seeding_parameters = histoMax_C3d_seeding_params.clone()
+        self.seeding_parameters = histoMax_C3d_seeding_params.clone(
+                seeds_norm_by_area=seeds_norm_by_area
+                )
         set_histomax_seeding_params(self.seeding_parameters, nBins_X1, nBins_X2, binSumsHisto, seed_threshold)
         set_histomax_clustering_params(self.clustering_parameters, distance, shape_threshold, shape_distance)
 
@@ -72,13 +74,16 @@ class CreateHistoMaxVariableDr(object):
             nBins_X2=histoMax_C3d_seeding_params.nBins_X2_histo_multicluster,
             binSumsHisto=histoMax_C3d_seeding_params.binSumsHisto,
             seed_threshold=histoMax_C3d_seeding_params.threshold_histo_multicluster,
+            seeds_norm_by_area=histoMax_C3d_seeding_params.seeds_norm_by_area,
             shape_threshold=histoMaxVariableDR_C3d_params.shape_threshold,
             shape_distance=histoMaxVariableDR_C3d_params.shape_distance,
             ):
         self.clustering_parameters= histoMax_C3d_clustering_params.clone(
                 dR_multicluster_byLayer_coefficientA = distances
                 )
-        self.seeding_parameters = histoMax_C3d_seeding_params.clone()
+        self.seeding_parameters = histoMax_C3d_seeding_params.clone(
+                seeds_norm_by_area=seeds_norm_by_area
+                )
         set_histomax_seeding_params(self.seeding_parameters, nBins_X1, nBins_X2, binSumsHisto, seed_threshold)
         set_histomax_clustering_params(self.clustering_parameters, 0, shape_threshold, shape_distance)
 
@@ -189,4 +194,34 @@ class CreateHistoThreshold(object):
                 )
         producer.ProcessorParameters.C3d_parameters.histoMax_C3d_seeding_parameters = self.seeding_parameters
         producer.ProcessorParameters.C3d_parameters.histoMax_C3d_clustering_parameters = self.clustering_parameters
+        return producer
+
+class CreateDistance(object):
+    def __init__(self, dR_multicluster = distance_C3d_params.dR_multicluster,
+                       minPt_multicluster = distance_C3d_params.minPt_multicluster):
+        self.params = distance_C3d_params.clone(
+              dR_multicluster = dR_multicluster,
+              minPt_multicluster = minPt_multicluster
+        )
+    def __call__(self, process, inputs):
+        producer = process.l1tHGCalBackEndLayer2Producer.clone(
+            InputCluster = cms.InputTag(inputs)
+        )
+        producer.ProcessorParameters.C3d_parameters = self.params
+        return producer
+
+class CreateDbscan(object):
+    def __init__(self, dist_dbscan = dbscan_C3d_params.dist_dbscan_multicluster,
+                       minN_dbscan = dbscan_C3d_params.minN_dbscan_multicluster,
+                       minPt_multicluster = dbscan_C3d_params.minPt_multicluster):
+        self.params = dbscan_C3d_params.clone(
+              minPt_multicluster = minPt_multicluster,
+              minN_dbscan_multicluster = minN_dbscan,
+              dist_dbscan_multicluster = dist_dbscan
+         )
+    def __call__(self, process, inputs):
+        producer = process.l1tHGCalBackEndLayer2Producer.clone(
+            InputCluster = cms.InputTag(inputs)
+        )
+        producer.ProcessorParameters.C3d_parameters = self.params
         return producer

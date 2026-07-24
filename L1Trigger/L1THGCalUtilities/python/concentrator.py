@@ -1,7 +1,7 @@
 
 import FWCore.ParameterSet.Config as cms
 import SimCalorimetry.HGCalSimProducers.hgcalDigitizer_cfi as digiparam
-from L1Trigger.L1THGCal.l1tHGCalConcentratorProducer_cfi import threshold_conc_proc, best_conc_proc, supertc_conc_proc, coarsetc_onebitfraction_proc, custom_conc_proc, autoEncoder_conc_proc
+from L1Trigger.L1THGCal.l1tHGCalConcentratorProducer_cfi import threshold_conc_proc, best_conc_proc, supertc_conc_proc, coarsetc_onebitfraction_proc, custom_conc_proc, autoEncoder_conc_proc 
 
 
 class CreateSuperTriggerCell(object):
@@ -68,11 +68,11 @@ class CreateBestChoice(object):
                 )
         return producer
 
+from L1Trigger.L1THGCal.ECONTritonProducer_cfi import AEProducer
+from L1Trigger.L1THGCal.MapMergeProducer_cfi import MapMergeProducer
 
 class CreateAutoencoder(object):
     def __init__(self,
-            cellRemap = autoEncoder_conc_proc.cellRemap,
-            cellRemapNoDuplicates = autoEncoder_conc_proc.cellRemapNoDuplicates,
             nBitsPerInput = autoEncoder_conc_proc.nBitsPerInput,
             maxBitsPerOutput = autoEncoder_conc_proc.maxBitsPerOutput,
             bitsPerLink = autoEncoder_conc_proc.bitsPerLink,
@@ -83,30 +83,50 @@ class CreateAutoencoder(object):
             zeroSuppresionThreshold = autoEncoder_conc_proc.zeroSuppresionThreshold,
             saveEncodedValues = autoEncoder_conc_proc.saveEncodedValues,
             preserveModuleSum = autoEncoder_conc_proc.preserveModuleSum,
+            threshold_scintillator = autoEncoder_conc_proc.threshold_scintillator,
+            threshold_silicon = autoEncoder_conc_proc.threshold_silicon,
+            useTransverseADC = autoEncoder_conc_proc.useTransverseADC,
+            clipTransverseADC = autoEncoder_conc_proc.clipTransverseADC,
+            skipAE = autoEncoder_conc_proc.skipAE,
+            bitsPerADC = autoEncoder_conc_proc.bitsPerADC,
+            bitsPerNorm = autoEncoder_conc_proc.bitsPerNorm,
+            bitsPerCALQ = autoEncoder_conc_proc.bitsPerCALQ,
+            useModuleFactor = autoEncoder_conc_proc.useModuleFactor, 
+            bitShiftNormalization = autoEncoder_conc_proc.bitShiftNormalization,
+            normByMax = autoEncoder_conc_proc.normByMax,
             scintillatorMethod = 'thresholdSelect',
-            ):
-         self.processor = autoEncoder_conc_proc.clone(
-                cellRemap = cellRemap,
-                cellRemapNoDuplicates = cellRemapNoDuplicates,
-                nBitsPerInput = nBitsPerInput,
-                maxBitsPerOutput = maxBitsPerOutput,
-                bitsPerLink = bitsPerLink,
-                modelFiles = modelFiles,
-                linkToGraphMap = linkToGraphMap,
-                encoderShape = encoderShape,
-                decoderShape = decoderShape,
-                zeroSuppresionThreshold = zeroSuppresionThreshold,
-                saveEncodedValues = saveEncodedValues,
-                preserveModuleSum = preserveModuleSum,
-                Method = cms.vstring(['autoEncoder','autoEncoder', scintillatorMethod]),
-                )
+            verbose = 0):
+        self.processor = autoEncoder_conc_proc.clone(
+            encoderShape = encoderShape,
+            decoderShape = decoderShape,
+            bitsPerADC = bitsPerADC,
+            bitsPerNorm = bitsPerNorm,
+            bitsPerCALQ = bitsPerCALQ,
+            nBitsPerInput = nBitsPerInput,
+            maxBitsPerOutput = maxBitsPerOutput,
+            bitsPerLink = bitsPerLink,
+            modelFiles = modelFiles,
+            linkToGraphMap = linkToGraphMap,
+            zeroSuppresionThreshold = zeroSuppresionThreshold,
+            useModuleFactor = useModuleFactor,
+            bitShiftNormalization = bitShiftNormalization,
+            useTransverseADC = useTransverseADC,
+            normByMax = normByMax,
+            skipAE = skipAE,
+            saveEncodedValues = saveEncodedValues,
+            preserveModuleSum = preserveModuleSum,
+            threshold_scintillator = threshold_scintillator,
+            threshold_silicon = threshold_silicon,
+            Method = cms.vstring(['autoEncoder','autoEncoder', scintillatorMethod]),
+            verbose = cms.int32(verbose)
+        )
 
     def __call__(self, process, inputs):
         producer = process.l1tHGCalConcentratorProducer.clone(
                 InputTriggerCells = cms.InputTag(inputs),
                 InputTriggerSums = cms.InputTag(inputs),
                 ProcessorParameters = self.processor
-                )
+        )
         return producer
 
 

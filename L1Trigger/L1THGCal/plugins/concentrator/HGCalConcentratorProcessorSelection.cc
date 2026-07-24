@@ -10,7 +10,7 @@ HGCalConcentratorProcessorSelection::HGCalConcentratorProcessorSelection(const e
       fixedDataSizePerHGCROC_(conf.getParameter<bool>("fixedDataSizePerHGCROC")),
       allTrigCellsInTrigSums_(conf.getParameter<bool>("allTrigCellsInTrigSums")),
       coarsenTriggerCells_(conf.getParameter<std::vector<unsigned>>("coarsenTriggerCells")),
-      selectionType_(kNSubDetectors_) {
+      selectionType_(kNSubDetectors_){
   std::vector<std::string> selectionType(conf.getParameter<std::vector<std::string>>("Method"));
   if (selectionType.size() != kNSubDetectors_ || coarsenTriggerCells_.size() != kNSubDetectors_) {
     throw cms::Exception("HGCTriggerParameterError")
@@ -68,6 +68,7 @@ void HGCalConcentratorProcessorSelection::run(const edm::Handle<l1t::HGCalTrigge
     coarsenerImpl_->setGeometry(geometry());
   if (trigSumImpl_)
     trigSumImpl_->setGeometry(geometry());
+  
   triggerTools_.setGeometry(geometry());
 
   auto& triggerCellCollOutput = std::get<0>(triggerCollOutput);

@@ -49,8 +49,6 @@ def create_constrainedtopological(process, inputs,
     set_threshold_params(producer.ProcessorParameters.C2d_parameters, seed_threshold, cluster_threshold)
     return producer
 
-
-
 class CreateDummy(object):
     def __call__(self, process, inputs):
         producer = process.l1tHGCalBackEndLayer1Producer.clone(
@@ -67,6 +65,38 @@ class CreateTruthDummy(object):
         producer.ProcessorParameters.C2d_parameters = dummy_C2d_params.clone()
         return producer
 
+class CreateDistance(object):
+    def __init__(self, dR_cluster = distance_C2d_params.dR_cluster):
+        self.params = distance_C2d_params.clone(
+            dR_cluster = dR_cluster
+        )
+    def __call__(self, process, inputs):
+        producer = process.l1tHGCalBackEndLayer1Producer.clone(
+              InputTriggerCells = cms.InputTag(inputs)
+        )
+        producer.ProcessorParameters.C2d_parameters = self.params
+        return producer
+
+class CreateTopological(object):
+    def __call__(self, process, inputs):
+        producer = process.l1tHGCalBackEndLayer1Producer.clone(
+              InputTriggerCells = cms.InputTag(inputs),
+        )
+        producer.ProcessorParameters.C2d_parameters = topological_C2d_params
+        return producer
+
+
+class CreateConstrTopological(object):
+    def __init__(self, dR_cluster = constrTopological_C2d_params.dR_cluster):
+        self.params = constrTopological_C2d_params.clone(
+              dR_cluster = dR_cluster
+        )
+    def __call__(self, process, inputs):
+        producer = process.l1tHGCalBackEndLayer1Producer.clone(
+              InputTriggerCells = cms.InputTag(inputs),
+        )
+        producer.ProcessorParameters.C2d_parameters = self.params
+        return producer
 
 class RozBinTruncation(object):
     def __init__(self,

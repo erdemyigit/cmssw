@@ -158,6 +158,7 @@ void HGCalTriggerNtupleHGCTriggerCells::fill(const edm::Event& e, const HGCalTri
   std::unordered_map<uint32_t, double> simhits_ee;
   std::unordered_map<uint32_t, double> simhits_fh;
   std::unordered_map<uint32_t, double> simhits_bh;
+  std::unordered_map<uint32_t, bool> simhit_has_rechit;
   if (fill_simenergy_)
     simhits(e, simhits_ee, simhits_fh, simhits_bh);
 
@@ -188,8 +189,9 @@ void HGCalTriggerNtupleHGCTriggerCells::fill(const edm::Event& e, const HGCalTri
   triggerTools_.setGeometry(es.geometry.product());
 
   clear();
+  //for each trigger cell
   for (auto tc_itr = trigger_cells.begin(0); tc_itr != trigger_cells.end(0); tc_itr++) {
-    if (tc_itr->hwPt() > 0) {
+    if (tc_itr->hwPt() >= 0) {//if nonzero energy
       auto cl_itr = cell2cluster.find(tc_itr->detId());
       auto mcl_itr = cell2multicluster.find(tc_itr->detId());
       uint32_t cl_id = (cl_itr != cell2cluster.end() ? cl_itr->second : 0);
@@ -204,7 +206,7 @@ void HGCalTriggerNtupleHGCTriggerCells::fill(const edm::Event& e, const HGCalTri
       tc_id_.emplace_back(tc_itr->detId());
       tc_side_.emplace_back(triggerTools_.zside(id));
       tc_layer_.emplace_back(triggerTools_.layerWithOffset(id));
-      if (id.det() == DetId::HGCalTrigger) {
+      if (id.det() == DetId::HGCalTrigger) {//switch subdet
         HGCalTriggerDetId idtrg(id);
         tc_subdet_.emplace_back(idtrg.subdet());
         tc_waferu_.emplace_back(idtrg.waferU());
@@ -223,7 +225,7 @@ void HGCalTriggerNtupleHGCTriggerCells::fill(const edm::Event& e, const HGCalTri
       } else {
         throw cms::Exception("InvalidHGCalTriggerDetid")
             << "Found unexpected trigger cell detid to be filled in HGCal Trigger Cell ntuple.";
-      }
+      }//end swtich subdet
       tc_data_.emplace_back(tc_itr->hwPt());
       tc_uncompressedCharge_.emplace_back(tc_itr->uncompressedCharge());
       tc_compressedCharge_.emplace_back(tc_itr->compressedCharge());
@@ -241,7 +243,7 @@ void HGCalTriggerNtupleHGCTriggerCells::fill(const edm::Event& e, const HGCalTri
       tc_multicluster_id_.emplace_back(mcl_id);
       tc_multicluster_pt_.emplace_back(mcl_pt);
 
-      if (fill_simenergy_) {
+      if (fill_simenergy_) {//if want simenergy
         double energy = 0;
         unsigned layer = triggerTools_.layerWithOffset(id);
         // search for simhit for all the cells inside the trigger cell
@@ -249,20 +251,26 @@ void HGCalTriggerNtupleHGCTriggerCells::fill(const edm::Event& e, const HGCalTri
           int thickness = triggerTools_.thicknessIndex(c_id);
           if (triggerTools_.isEm(id)) {
             auto itr = simhits_ee.find(c_id);
-            if (itr != simhits_ee.end())
+            if (itr != simhits_ee.end()){
               energy += calibrate(itr->second, thickness, layer);
+              simhit_has_rechit[c_id] = true;
+            }
           } else if (triggerTools_.isSilicon(id)) {
             auto itr = simhits_fh.find(c_id);
-            if (itr != simhits_fh.end())
+            if (itr != simhits_fh.end()){
               energy += calibrate(itr->second, thickness, layer);
+              simhit_has_rechit[c_id] = true;
+            }
           } else {
             auto itr = simhits_bh.find(c_id);
-            if (itr != simhits_bh.end())
+            if (itr != simhits_bh.end()){
               energy += itr->second;
+              simhit_has_rechit[c_id] = true;
+            }
           }
         }
         tc_simenergy_.emplace_back(energy);
-      }
+      }//end if want simenergy
     }
 
     if (fill_truthmap_) {
@@ -272,7 +280,118 @@ void HGCalTriggerNtupleHGCTriggerCells::fill(const edm::Event& e, const HGCalTri
       else
         tc_genparticle_index_.push_back(itr->second);
     }
-  }
+  }//end for each trigger cell
+
+  //make phantom trigger cells wherever there is simenergy
+  if(fill_simenergy_){
+    std::unordered_map<uint32_t, bool> make_phantom_tc;
+
+    for (const auto& simcell : simhits_ee){//for each ee simhit
+      if (simhit_has_rechit[simcell.first]){
+        continue;
+      } else{
+        uint32_t tcid = triggerTools_.getTriggerGeometry()->getTriggerCellFromCell(simcell.first);
+        make_phantom_tc[tcid] = true;
+      }
+    }//end for each ee simhit
+    for (const auto& simcell : simhits_fh){//for each fh simhit
+      if (simhit_has_rechit[simcell.first]){
+        continue;
+      } else{
+        uint32_t tcid = triggerTools_.getTriggerGeometry()->getTriggerCellFromCell(simcell.first);
+        make_phantom_tc[tcid] = true;
+      }
+    }//end for each fh simhit
+    for (const auto& simcell : simhits_bh){//for each bh simhit
+      if (simhit_has_rechit[simcell.first]){
+        continue;
+      } else{
+        uint32_t tcid = triggerTools_.getTriggerGeometry()->getTriggerCellFromCell(simcell.first);
+        make_phantom_tc[tcid] = true;
+      }
+    }//end for each bh simhit
+
+    //for each phantom tc to make
+    for (const auto& tc: make_phantom_tc){
+      if(!tc.second){
+        continue;
+      } else {
+        DetId id(tc.first);
+        tc_id_.emplace_back(tc.first);
+        tc_side_.emplace_back(triggerTools_.zside(id));
+        tc_layer_.emplace_back(triggerTools_.layerWithOffset(id));
+        if (id.det() == DetId::HGCalTrigger) {//switch subdet
+          HGCalTriggerDetId idtrg(id);
+          tc_subdet_.emplace_back(idtrg.subdet());
+          tc_waferu_.emplace_back(idtrg.waferU());
+          tc_waferv_.emplace_back(idtrg.waferV());
+          tc_wafertype_.emplace_back(idtrg.type());
+          tc_cellu_.emplace_back(idtrg.triggerCellU());
+          tc_cellv_.emplace_back(idtrg.triggerCellV());
+        } else if (id.det() == DetId::HGCalHSc) {
+          HGCScintillatorDetId idsci(id);
+          tc_subdet_.emplace_back(idsci.subdet());
+          tc_waferu_.emplace_back(-999);
+          tc_waferv_.emplace_back(-999);
+          tc_wafertype_.emplace_back(idsci.type());
+          tc_cellu_.emplace_back(idsci.ietaAbs());
+          tc_cellv_.emplace_back(idsci.iphi());
+        } else {
+          throw cms::Exception("InvalidHGCalTriggerDetid")
+              << "Found unexpected trigger cell detid to be filled in HGCal Trigger Cell ntuple.";
+        }//end swtich subdet
+
+        tc_data_.emplace_back(0);
+        tc_uncompressedCharge_.emplace_back(0);
+        tc_compressedCharge_.emplace_back(0);
+        tc_mipPt_.emplace_back(0);
+        // physical values
+        tc_pt_.emplace_back(0);
+        tc_energy_.emplace_back(0);
+        const auto& pos = triggerTools_.getTriggerGeometry()->getTriggerCellPosition(tc.first);
+        tc_eta_.emplace_back(pos.eta());
+        tc_phi_.emplace_back(pos.phi());
+        tc_x_.emplace_back(pos.x());
+        tc_y_.emplace_back(pos.y());
+        tc_z_.emplace_back(pos.z());
+
+        tc_cluster_id_.emplace_back(-1);
+        tc_multicluster_id_.emplace_back(-1);
+        tc_multicluster_pt_.emplace_back(-1);
+
+        double energy = 0;
+        unsigned layer = triggerTools_.layerWithOffset(id);
+        // search for simhit for all the cells inside the trigger cell
+        for (uint32_t c_id : triggerTools_.getTriggerGeometry()->getCellsFromTriggerCell(id)) {
+          int thickness = triggerTools_.thicknessIndex(c_id);
+          if (triggerTools_.isEm(id)) {//switch subdet
+            auto itr = simhits_ee.find(c_id);
+            if (itr != simhits_ee.end()){
+              energy += calibrate(itr->second, thickness, layer);
+              simhit_has_rechit[c_id] = true;
+            }
+          } else if (triggerTools_.isSilicon(id)) {
+            auto itr = simhits_fh.find(c_id);
+            if (itr != simhits_fh.end()){
+              energy += calibrate(itr->second, thickness, layer);
+              simhit_has_rechit[c_id] = true;
+            }
+          } else {
+            auto itr = simhits_bh.find(c_id);
+            if (itr != simhits_bh.end()){
+              energy += itr->second;
+              simhit_has_rechit[c_id] = true;
+            }
+          }//end switch subdet
+        }//end for each subcell in tc
+        tc_simenergy_.emplace_back(energy);
+
+        if (fill_truthmap_){
+          tc_genparticle_index_.push_back(-1);
+        }
+      }//end else
+    }//end for each phantom trigger cell
+  }//end if simenergy
 }
 
 double HGCalTriggerNtupleHGCTriggerCells::calibrate(double energy, int thickness, unsigned layer) {
@@ -299,7 +418,7 @@ void HGCalTriggerNtupleHGCTriggerCells::simhits(const edm::Event& e,
 
   // EE
   for (const auto& simhit : ee_simhits) {
-    DetId id = triggerTools_.simToReco(simhit.id(), triggerTools_.getTriggerGeometry()->eeTopology());
+    DetId id = simhit.id();
     if (id.rawId() == 0)
       continue;
     auto itr_insert = simhits_ee.emplace(id, 0.);
@@ -307,7 +426,7 @@ void HGCalTriggerNtupleHGCTriggerCells::simhits(const edm::Event& e,
   }
   //  FH
   for (const auto& simhit : fh_simhits) {
-    DetId id = triggerTools_.simToReco(simhit.id(), triggerTools_.getTriggerGeometry()->fhTopology());
+    DetId id = simhit.id();
     if (id.rawId() == 0)
       continue;
     auto itr_insert = simhits_fh.emplace(id, 0.);
@@ -315,7 +434,7 @@ void HGCalTriggerNtupleHGCTriggerCells::simhits(const edm::Event& e,
   }
   //  BH
   for (const auto& simhit : bh_simhits) {
-    DetId id = triggerTools_.simToReco(simhit.id(), triggerTools_.getTriggerGeometry()->hscTopology());
+    DetId id = simhit.id();
     if (id.rawId() == 0)
       continue;
     auto itr_insert = simhits_bh.emplace(id, 0.);

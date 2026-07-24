@@ -1,0 +1,12 @@
+defaults:
+  isMC: True
+  year: Phase2C17I13M9
+  globaltag: auto:phase2_realistic_T21
+  pset: $CMSSW_BASE/src/L1Trigger/L1THGCalUtilities/test/test_CAE.py
+  splitting: FileBased
+  unitsPerJob: 1
+
+samples:
+  MyPrivateSample:
+    datasets:
+      myprivate_files: "myfiles.txt"

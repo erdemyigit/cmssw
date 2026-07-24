@@ -52,8 +52,10 @@ bestchoice_ndata_centralized = [
         ]
 
 
+# Values taken from ECON-T working document v9 (March 2022)
+# https://edms.cern.ch/file/2206779/1/ECON-T_specification_working_doc_v9_2mar2022.pdf
 bestchoice_ndata_decentralized = [
-        1, 3, 6, 9, 14, 18, 23, 27, 32, 37, 41, 46, 0, 0, 0, 0,
+        1, 4, 6, 9, 14, 18, 23, 28, 32, 37, 41, 46, 48, 0, 0, 0,
         0, 0, 0, 0,  0,  0,  0,  0,  0,  0,  0,  0, 0, 0, 0, 0,
         0, 0, 0, 0,  0,  0,  0,  0,  0,  0,  0,  0, 0, 0, 0, 0,
         0, 0, 0, 0,  0,  0,  0,  0,  0,  0,  0,  0, 0, 0, 0, 0,
@@ -164,23 +166,6 @@ coarsetc_equalshare_proc = cms.PSet(ProcessorName  = cms.string('HGCalConcentrat
 )
 
 
-autoencoder_triggerCellRemap = [0,16, 32,
-                                1,17, 33,
-                                2,18, 34,
-                                3,19, 35,
-                                4,20, 36,
-                                5,21, 37,
-                                6,22, 38,
-                                7,23, 39,
-                                8,24, 40,
-                                9,25, 41,
-                                10,26, 42,
-                                11,27, 43,
-                                12,28, 44,
-                                13,29, 45,
-                                14,30, 46,
-                                15,31, 47]
-
 autoEncoder_bitsPerOutputLink = cms.vint32([0, 1, 3, 5, 7, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9])
 
 autoEncoder_training_2eLinks = cms.PSet(encoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/encoder_2eLinks_PUdriven_constantgraph.pb'),
@@ -197,13 +182,15 @@ autoEncoder_training_5eLinks = cms.PSet(encoderModelFile = cms.FileInPath('L1Tri
 
 linkToGraphMapping = [0,0,0,1,2,3,3,3,3,3,3,3,3,3,3]
 
-autoEncoder_conc_proc = cms.PSet(ProcessorName  = cms.string('HGCalConcentratorProcessorSelection'),
+autoEncoder_conc_proc = cms.PSet(
+    ProcessorName  = cms.string('HGCalConcentratorProcessorSelection'),
                                  Method = cms.vstring(['autoEncoder','autoEncoder','thresholdSelect']),
-                                 cellRemap = cms.vint32(autoencoder_triggerCellRemap),
-                                 cellRemapNoDuplicates = cms.vint32(autoencoder_triggerCellRemap),
                                  encoderShape = cms.vuint32(1,4,4,3),
                                  decoderShape = cms.vuint32(1,16),
-                                 nBitsPerInput = cms.int32(8),
+                                 bitsPerADC = cms.uint32(22),
+                                 bitsPerNorm = cms.uint32(12),
+                                 bitsPerCALQ = cms.uint32(23),
+                                 nBitsPerInput = cms.uint32(8),
                                  maxBitsPerOutput = cms.int32(9),
                                  bitsPerLink = autoEncoder_bitsPerOutputLink,
                                  modelFiles = cms.VPSet([autoEncoder_training_2eLinks, autoEncoder_training_3eLinks, autoEncoder_training_4eLinks, autoEncoder_training_5eLinks]),
@@ -212,6 +199,11 @@ autoEncoder_conc_proc = cms.PSet(ProcessorName  = cms.string('HGCalConcentratorP
                                  bitShiftNormalization = cms.bool(True),
                                  saveEncodedValues = cms.bool(False),
                                  preserveModuleSum = cms.bool(True),
+                                 useTransverseADC = cms.bool(True),
+                                 useModuleFactor = cms.bool(False),
+                                 normByMax = cms.bool(False),
+                                 clipTransverseADC = cms.bool(True),
+                                 skipAE = cms.bool(False),
                                  threshold_silicon = cms.double(2.), # MipT
                                  threshold_scintillator = cms.double(2.), # MipT
                                  type_energy_division = supertc_conc_proc.type_energy_division,
@@ -225,9 +217,6 @@ autoEncoder_conc_proc = cms.PSet(ProcessorName  = cms.string('HGCalConcentratorP
                                  superTCCalibration = vfe_proc.clone(),
 )
 
-
-
-
 from Configuration.Eras.Modifier_phase2_hgcalV10_cff import phase2_hgcalV10
 # >= V9 samples have a different definition of the dEdx calibrations. To account for it
 # we rescale the thresholds of the FE selection
@@ -236,19 +225,18 @@ from Configuration.Eras.Modifier_phase2_hgcalV10_cff import phase2_hgcalV10
 phase2_hgcalV10.toModify(threshold_conc_proc,
                         threshold_silicon=1.35,  # MipT
                         threshold_scintillator=1.35,  # MipT
-                        )
+)
 
 
 l1tHGCalConcentratorProducer = cms.EDProducer(
     "HGCalConcentratorProducer",
     InputTriggerCells = cms.InputTag('l1tHGCalVFEProducer:HGCalVFEProcessorSums'),
     InputTriggerSums = cms.InputTag('l1tHGCalVFEProducer:HGCalVFEProcessorSums'),
-    ProcessorParameters = threshold_conc_proc.clone()
-    )
-
+    ProcessorParameters = threshold_conc_proc.clone(),
+    InputAE = cms.InputTag(''),
+)
 
 l1tHGCalConcentratorProducerHFNose = l1tHGCalConcentratorProducer.clone(
     InputTriggerCells = cms.InputTag('l1tHFnoseVFEProducer:HGCalVFEProcessorSums'),
     InputTriggerSums = cms.InputTag('l1tHFnoseVFEProducer:HGCalVFEProcessorSums')
 )
-

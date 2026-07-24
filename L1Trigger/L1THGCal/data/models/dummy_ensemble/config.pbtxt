@@ -1,0 +1,47 @@
+name: "dummy_ensemble"
+platform: "ensemble"
+max_batch_size: 1000000
+input [
+{
+  name: "CALQ__0"
+  data_type: TYPE_FP32
+  dims: [48]
+}]
+output [
+{
+  name: "ECON__0"
+  data_type: TYPE_FP32
+  dims: [16]
+},
+{
+  name: "rCALQ__1"
+  data_type: TYPE_FP32
+  dims: [48]
+}]
+ensemble_scheduling{
+  step [
+  {
+    model_name: "dummy_AE"
+    model_version: -1
+    input_map {
+      key: "CALQ__0"
+      value: "CALQ__0"
+    }
+    output_map {
+      key: "rCALQ__0"
+      value: "rCALQ__1"
+    }
+  },
+  {
+    model_name: "dummy_ECON"
+    model_version: -1
+    input_map {
+      key: "CALQ__0"
+      value: "CALQ__0"
+    }
+    output_map {
+      key: "ECON__0"
+      value: "ECON__0"
+    }
+  }
+]}

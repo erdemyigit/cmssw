@@ -1,0 +1,15 @@
+defaults:
+  isMC: True
+  splitting: FileBased
+  reco_version: UL
+  year: Phase2C17I13M9
+  globaltag: auto:phase2_realistic_T21
+  pset: $CMSSW_BASE/src/L1Trigger/L1THGCalUtilities/test/test_noAE.py
+  allowInvalid: False
+  unitsPerJob: 1
+    #totalUnits: 2
+
+samples:
+  EGun_200PU: 
+    datasets: 
+      EGun_200PU_all : /DoubleElectron_FlatPt-1To100-gun/Phase2Fall22DRMiniAOD-PU200_125X_mcRun4_realistic_v2-v1/GEN-SIM-DIGI-RAW-MINIAOD

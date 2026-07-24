@@ -185,8 +185,13 @@ egamma_identification_drnn_cone = cms.PSet(
         CategoriesPtMin=cms.vdouble([cat.pt_min for cat in categories]),
         CategoriesPtMax=cms.vdouble([cat.pt_max for cat in categories]),
         Weights=cms.vstring(bdt_weights_drnn_cone),
-        WorkingPoints=cms.vdouble([wps[eff] for wps,eff in zip(working_points_drnn_cone,tight_wp)]),
-        )
+        WorkingPoints=cms.VPSet([
+            cms.PSet(
+                Name=cms.string('tight'),
+                WorkingPoint=cms.vdouble([wps[eff] for wps,eff in zip(working_points_drnn_cone,tight_wp)])
+            )
+        ])
+)
 
 egamma_identification_drnn_dbscan = cms.PSet(
         Inputs=cms.vstring(inputs_small),
@@ -195,8 +200,13 @@ egamma_identification_drnn_dbscan = cms.PSet(
         CategoriesPtMin=cms.vdouble([cat.pt_min for cat in categories]),
         CategoriesPtMax=cms.vdouble([cat.pt_max for cat in categories]),
         Weights=cms.vstring(bdt_weights_drnn_dbscan),
-        WorkingPoints=cms.vdouble([wps[eff] for wps,eff in zip(working_points_drnn_dbscan,tight_wp)]),
-        )
+        WorkingPoints=cms.VPSet([
+            cms.PSet(
+                Name=cms.string('tight'),
+                WorkingPoint=cms.vdouble([wps[eff] for wps,eff in zip(working_points_drnn_dbscan,tight_wp)]),
+            )
+        ])
+)
 
 egamma_identification_histomax = cms.PSet(
         Inputs=cms.vstring(input_features_histomax['v10_3151']),

@@ -49,6 +49,7 @@ distance_C2d_params = cms.PSet(c2d_calib_pset,
 topological_C2d_params = cms.PSet(c2d_calib_pset,
                                   c2d_thresholds_pset,
                                   clusterType=cms.string('NNC2d'),
+                                  dR_cluster=cms.double(0.0),
                                   )
 
 constrTopological_C2d_params = cms.PSet(c2d_calib_pset,

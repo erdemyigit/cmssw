@@ -1,4 +1,5 @@
 import FWCore.ParameterSet.Config as cms
+from L1Trigger.L1THGCalUtilities.hgcalTriggerNtuples_cfi import ntuple_wafers
 
 def custom_ntuples_layer1_truncation(process):
     ntuples = process.l1tHGCalTriggerNtuplizer.Ntuples
@@ -26,6 +27,12 @@ def custom_ntuples_standalone_clustering(process):
            ntuple.NtupleName=='HGCalTriggerNtupleHGCClusters' or \
            ntuple.NtupleName=='HGCalTriggerNtupleHGCMulticlusters':
             ntuple.Multiclusters = cms.InputTag('l1tHGCalBackEndLayer2Producer:HGCalBackendLayer2Processor3DClusteringSA')
+
+    # Include HW cluster properties in ntupliser
+    for ntuple in ntuples:    
+        if ntuple.NtupleName.value() == 'HGCalTriggerNtupleHGCMulticlusters':
+            ntuple.FillHWClusterProperties = True
+
     return process
 
 
@@ -39,15 +46,25 @@ def custom_ntuples_standalone_tower(process):
 
 class CreateNtuple(object):
     def __init__(self,
-        ntuple_list=[
-            'event',
-            'gen', 'genjet', 'gentau',
-            'digis',
-            'triggercells',
-            'clusters', 'multiclusters'
-            ]
-            ):
+                 ntuple_list=[
+                     'event',
+                     'gen', 'genjet', 'gentau',
+                     'digis',
+                     'triggercells',
+                     'clusters', 'multiclusters','econdata',
+                 ],
+                 useModuleFactor = ntuple_wafers.useModuleFactor,
+                 useTransverseADC = ntuple_wafers.useTransverseADC,
+                 bitShiftNormalize = ntuple_wafers.bitShiftNormalize,
+                 normByMax = ntuple_wafers.normByMax,
+                 bitsPerInput = ntuple_wafers.bitsPerInput):
+
         self.ntuple_list = ntuple_list
+        self.useModuleFactor = useModuleFactor
+        self.useTransverseADC = useTransverseADC
+        self.bitShiftNormalize = bitShiftNormalize
+        self.normByMax = normByMax
+        self.bitsPerInput = bitsPerInput
 
     def __call__(self, process, inputs):
         vpset = []
@@ -56,11 +73,20 @@ class CreateNtuple(object):
             if ntuple=='triggercells':
                 pset.TriggerCells = cms.InputTag(inputs[0])
                 pset.Multiclusters = cms.InputTag(inputs[2])
+            elif ntuple=='wafers':
+                pset.TriggerCells = cms.InputTag(inputs[0])
+                pset.useModuleFactor = self.useModuleFactor
+                pset.useTransverseADC = self.useTransverseADC
+                pset.bitShiftNormalize = self.bitShiftNormalize
+                pset.normByMax = self.normByMax
+                pset.bitsPerInput = self.bitsPerInput
             elif ntuple=='clusters':
                 pset.Clusters = cms.InputTag(inputs[1])
                 pset.Multiclusters = cms.InputTag(inputs[2])
             elif ntuple=='multiclusters':
                 pset.Multiclusters = cms.InputTag(inputs[2])
+            elif ntuple=='econdata':
+                pset.ConcentratorData = cms.InputTag(inputs[0])
             vpset.append(pset)
         ntuplizer = process.l1tHGCalTriggerNtuplizer.clone()
         ntuplizer.Ntuples = cms.VPSet(vpset)

@@ -12,3 +12,13 @@ class CreateGenMatch(object):
                 src = cms.InputTag(inputs)
                 )
         return producer
+
+class CreateDummy(object):
+    def __init__(self):
+        pass
+
+    def __call__(self, process, inputs):
+        producer = process.l1tHGCal3DClusterDummySelector.clone(
+            src = cms.InputTag(inputs)
+        )
+        return producer

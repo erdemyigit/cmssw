@@ -4,7 +4,7 @@
 #include <vector>
 #include <cstdint>  // uint32_t
 
-namespace l1thgcfirmware {
+namespace l1thgcfirmwareDUMMY {
 
   class Stage1TruncationConfig {
   public:
@@ -67,6 +67,6 @@ namespace l1thgcfirmware {
     uint32_t fpga_id_;
   };
 
-}  // namespace l1thgcfirmware
+}  // namespace l1thgcfirmwareDUMMY
 
 #endif

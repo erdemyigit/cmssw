@@ -1,0 +1,299 @@
+DEBUG 2024-09-06 20:13:59.142 UTC: 	 CRAB Client version: v3.240621
+DEBUG 2024-09-06 20:13:59.142 UTC: 	 Running on: Linux cmslpc243.fnal.gov 4.18.0-553.16.1.el8_10.x86_64 #1 SMP Thu Aug 8 07:11:46 EDT 2024 x86_64 x86_64 x86_64 GNU/Linux - AlmaLinux 8.10 (Cerulean Leopard)
+DEBUG 2024-09-06 20:13:59.143 UTC: 	 Executing command: 'status'
+DEBUG 2024-09-06 20:13:59.143 UTC: 	 Found CRAB cache file /uscms/home/eertorer/.crab3
+ERROR 2024-09-06 20:13:59.153 UTC: 	 Error: crab/Papermodel_09-06-24 is not a valid CRAB project directory.
+ERROR 2024-09-06 20:13:59.153 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.240621.01/bin/crab.py", line 152, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.240621.01/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.240621.01/lib/CRABClient/Commands/status.py", line 48, in __init__
+    SubCommand.__init__(self, logger, cmdargs)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.240621.01/lib/CRABClient/Commands/SubCommand.py", line 280, in __init__
+    SubCommand.validateOptions(self)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.240621.01/lib/CRABClient/Commands/SubCommand.py", line 680, in validateOptions
+    raise ConfigurationException(msg)
+CRABClient.ClientExceptions.ConfigurationException: [91mError[0m: crab/Papermodel_09-06-24 is not a valid CRAB project directory.
+INFO 2024-09-06 20:13:59.172 UTC: 	 Log file is /uscms_data/d3/eertorer/CMSSW_12_5_2_patch1/src/L1Trigger/L1THGCalUtilities/production/crab.log
+DEBUG 2024-09-06 20:14:25.467 UTC: 	 CRAB Client version: v3.240621
+DEBUG 2024-09-06 20:14:25.467 UTC: 	 Running on: Linux cmslpc243.fnal.gov 4.18.0-553.16.1.el8_10.x86_64 #1 SMP Thu Aug 8 07:11:46 EDT 2024 x86_64 x86_64 x86_64 GNU/Linux - AlmaLinux 8.10 (Cerulean Leopard)
+DEBUG 2024-09-06 20:14:25.467 UTC: 	 Executing command: 'status'
+DEBUG 2024-09-06 20:14:25.467 UTC: 	 Found CRAB cache file /uscms/home/eertorer/.crab3
+ERROR 2024-09-06 20:14:25.469 UTC: 	 Cannot find .requestcache file in CRAB project directory /uscms_data/d3/eertorer/CMSSW_12_5_2_patch1/src/L1Trigger/L1THGCalUtilities/production/crab/eertorer_Papermodel_09-06-24/crab_eertorer_Papermodel_09-06-24_Phase2C17I13M9_EGun_200PU_all
+ERROR 2024-09-06 20:14:25.469 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.240621.01/bin/crab.py", line 152, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.240621.01/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.240621.01/lib/CRABClient/Commands/status.py", line 48, in __init__
+    SubCommand.__init__(self, logger, cmdargs)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.240621.01/lib/CRABClient/Commands/SubCommand.py", line 280, in __init__
+    SubCommand.validateOptions(self)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.240621.01/lib/CRABClient/Commands/SubCommand.py", line 684, in validateOptions
+    self.loadLocalCache()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.240621.01/lib/CRABClient/Commands/SubCommand.py", line 531, in loadLocalCache
+    raise ex
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.240621.01/lib/CRABClient/Commands/SubCommand.py", line 525, in loadLocalCache
+    self.cachedinfo, self.logfile = loadCache(self.requestarea, self.logger)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.240621.01/lib/CRABClient/ClientUtilities.py", line 445, in loadCache
+    raise CachefileNotFoundException(msg)
+CRABClient.ClientExceptions.CachefileNotFoundException: Cannot find .requestcache file in CRAB project directory /uscms_data/d3/eertorer/CMSSW_12_5_2_patch1/src/L1Trigger/L1THGCalUtilities/production/crab/eertorer_Papermodel_09-06-24/crab_eertorer_Papermodel_09-06-24_Phase2C17I13M9_EGun_200PU_all
+INFO 2024-09-06 20:14:25.472 UTC: 	 Log file is /uscms_data/d3/eertorer/CMSSW_12_5_2_patch1/src/L1Trigger/L1THGCalUtilities/production/crab.log
+DEBUG 2024-09-17 14:44:06.167 UTC: 	 CRAB Client version: v3.240621
+DEBUG 2024-09-17 14:44:06.167 UTC: 	 Running on: Linux cmslpc240.fnal.gov 4.18.0-553.16.1.el8_10.x86_64 #1 SMP Thu Aug 8 07:11:46 EDT 2024 x86_64 x86_64 x86_64 GNU/Linux - AlmaLinux 8.10 (Cerulean Leopard)
+DEBUG 2024-09-17 14:44:06.167 UTC: 	 Executing command: 'submit'
+DEBUG 2024-09-17 14:44:06.168 UTC: 	 Found CRAB cache file /uscms/home/eertorer/.crab3
+DEBUG 2024-09-17 14:44:06.175 UTC: 	 Will use CRAB plugin ANALYSIS (i.e. will run an analysis job type).
+DEBUG 2024-09-23 15:23:08.202 UTC: 	 CRAB Client version: v3.240621
+DEBUG 2024-09-23 15:23:08.202 UTC: 	 Running on: Linux cmslpc245.fnal.gov 4.18.0-553.16.1.el8_10.x86_64 #1 SMP Thu Aug 8 07:11:46 EDT 2024 x86_64 x86_64 x86_64 GNU/Linux - AlmaLinux 8.10 (Cerulean Leopard)
+DEBUG 2024-09-23 15:23:08.202 UTC: 	 Executing command: 'submit'
+DEBUG 2024-09-23 15:23:08.203 UTC: 	 Found CRAB cache file /uscms/home/eertorer/.crab3
+DEBUG 2024-09-23 15:23:08.218 UTC: 	 Will use CRAB plugin ANALYSIS (i.e. will run an analysis job type).
+DEBUG 2025-03-12 01:00:53.032 UTC: 	 CRAB Client version: v3.241125
+DEBUG 2025-03-12 01:00:53.033 UTC: 	 Running on: Linux cmslpc201.fnal.gov 4.18.0-553.30.1.el8_10.x86_64 #1 SMP Tue Nov 26 02:30:26 EST 2024 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-03-12 01:00:53.033 UTC: 	 Not using Singularity
+DEBUG 2025-03-12 01:00:53.033 UTC: 	 Operating System: AlmaLinux 8.10 (Cerulean Leopard)
+DEBUG 2025-03-12 01:00:53.033 UTC: 	 Executing command: 'status'
+DEBUG 2025-03-12 01:00:53.033 UTC: 	 Found CRAB cache file /uscms/home/eertorer/.crab3
+ERROR 2025-03-12 01:00:53.042 UTC: 	 Error: /crab/eertorer_Sync_elink_90_20_files_500_epoch_3/crab_eertorer_Sync_elink_90_20_files_500_epoch_3_Phase2C17I13M9_EGun_200PU_all is not a valid CRAB project directory.
+ERROR 2025-03-12 01:00:53.042 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.241125.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.241125.00/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])  # the crab command to be executed
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.241125.00/lib/CRABClient/Commands/status.py", line 48, in __init__
+    SubCommand.__init__(self, logger, cmdargs)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.241125.00/lib/CRABClient/Commands/SubCommand.py", line 281, in __init__
+    SubCommand.validateOptions(self)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.241125.00/lib/CRABClient/Commands/SubCommand.py", line 691, in validateOptions
+    raise ConfigurationException(msg)
+CRABClient.ClientExceptions.ConfigurationException: [91mError[0m: /crab/eertorer_Sync_elink_90_20_files_500_epoch_3/crab_eertorer_Sync_elink_90_20_files_500_epoch_3_Phase2C17I13M9_EGun_200PU_all is not a valid CRAB project directory.
+INFO 2025-03-12 01:00:53.044 UTC: 	 Log file is /uscms_data/d3/eertorer/CMSSW_12_5_2_patch1/src/L1Trigger/L1THGCalUtilities/production/crab.log
+DEBUG 2025-03-12 01:01:24.634 UTC: 	 CRAB Client version: v3.241125
+DEBUG 2025-03-12 01:01:24.634 UTC: 	 Running on: Linux cmslpc201.fnal.gov 4.18.0-553.30.1.el8_10.x86_64 #1 SMP Tue Nov 26 02:30:26 EST 2024 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-03-12 01:01:24.634 UTC: 	 Not using Singularity
+DEBUG 2025-03-12 01:01:24.634 UTC: 	 Operating System: AlmaLinux 8.10 (Cerulean Leopard)
+DEBUG 2025-03-12 01:01:24.634 UTC: 	 Executing command: 'status'
+DEBUG 2025-03-12 01:01:24.634 UTC: 	 Found CRAB cache file /uscms/home/eertorer/.crab3
+ERROR 2025-03-12 01:01:24.635 UTC: 	 Error: /crab/eertorer_Sync_elink_90_20_files_500_epoch_3 is not a valid CRAB project directory.
+ERROR 2025-03-12 01:01:24.635 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.241125.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.241125.00/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])  # the crab command to be executed
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.241125.00/lib/CRABClient/Commands/status.py", line 48, in __init__
+    SubCommand.__init__(self, logger, cmdargs)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.241125.00/lib/CRABClient/Commands/SubCommand.py", line 281, in __init__
+    SubCommand.validateOptions(self)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.241125.00/lib/CRABClient/Commands/SubCommand.py", line 691, in validateOptions
+    raise ConfigurationException(msg)
+CRABClient.ClientExceptions.ConfigurationException: [91mError[0m: /crab/eertorer_Sync_elink_90_20_files_500_epoch_3 is not a valid CRAB project directory.
+INFO 2025-03-12 01:01:24.637 UTC: 	 Log file is /uscms_data/d3/eertorer/CMSSW_12_5_2_patch1/src/L1Trigger/L1THGCalUtilities/production/crab.log
+DEBUG 2025-03-12 01:01:36.806 UTC: 	 CRAB Client version: v3.241125
+DEBUG 2025-03-12 01:01:36.806 UTC: 	 Running on: Linux cmslpc201.fnal.gov 4.18.0-553.30.1.el8_10.x86_64 #1 SMP Tue Nov 26 02:30:26 EST 2024 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-03-12 01:01:36.806 UTC: 	 Not using Singularity
+DEBUG 2025-03-12 01:01:36.806 UTC: 	 Operating System: AlmaLinux 8.10 (Cerulean Leopard)
+DEBUG 2025-03-12 01:01:36.806 UTC: 	 Executing command: 'status'
+DEBUG 2025-03-12 01:01:36.807 UTC: 	 Found CRAB cache file /uscms/home/eertorer/.crab3
+ERROR 2025-03-12 01:01:36.807 UTC: 	 Error: /crab/eertorer_Sync_elink_90_20_files_500_epoch_3/ is not a valid CRAB project directory.
+ERROR 2025-03-12 01:01:36.807 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.241125.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.241125.00/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])  # the crab command to be executed
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.241125.00/lib/CRABClient/Commands/status.py", line 48, in __init__
+    SubCommand.__init__(self, logger, cmdargs)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.241125.00/lib/CRABClient/Commands/SubCommand.py", line 281, in __init__
+    SubCommand.validateOptions(self)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.241125.00/lib/CRABClient/Commands/SubCommand.py", line 691, in validateOptions
+    raise ConfigurationException(msg)
+CRABClient.ClientExceptions.ConfigurationException: [91mError[0m: /crab/eertorer_Sync_elink_90_20_files_500_epoch_3/ is not a valid CRAB project directory.
+INFO 2025-03-12 01:01:36.809 UTC: 	 Log file is /uscms_data/d3/eertorer/CMSSW_12_5_2_patch1/src/L1Trigger/L1THGCalUtilities/production/crab.log
+DEBUG 2025-04-16 20:14:44.847 UTC: 	 CRAB Client version: v3.250318
+DEBUG 2025-04-16 20:14:44.847 UTC: 	 Running on: Linux cmslpc201.fnal.gov 4.18.0-553.30.1.el8_10.x86_64 #1 SMP Tue Nov 26 02:30:26 EST 2024 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-04-16 20:14:44.847 UTC: 	 Not using Singularity
+DEBUG 2025-04-16 20:14:44.847 UTC: 	 Operating System: AlmaLinux 8.10 (Cerulean Leopard)
+DEBUG 2025-04-16 20:14:44.847 UTC: 	 Executing command: 'submit'
+DEBUG 2025-04-16 20:14:44.848 UTC: 	 Found CRAB cache file /uscms/home/eertorer/.crab3
+DEBUG 2025-04-16 20:14:44.849 UTC: 	 Will use CRAB plugin ANALYSIS (i.e. will run an analysis job type).
+DEBUG 2025-05-08 17:34:34.880 UTC: 	 CRAB Client version: v3.250409
+DEBUG 2025-05-08 17:34:34.881 UTC: 	 Running on: Linux cmslpc201.fnal.gov 4.18.0-553.30.1.el8_10.x86_64 #1 SMP Tue Nov 26 02:30:26 EST 2024 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-05-08 17:34:34.881 UTC: 	 Not using Singularity
+DEBUG 2025-05-08 17:34:34.881 UTC: 	 Operating System: AlmaLinux 8.10 (Cerulean Leopard)
+DEBUG 2025-05-08 17:34:34.881 UTC: 	 Executing command: 'submit'
+DEBUG 2025-05-08 17:34:34.881 UTC: 	 Found CRAB cache file /uscms/home/eertorer/.crab3
+DEBUG 2025-05-08 17:34:34.896 UTC: 	 Will use CRAB plugin ANALYSIS (i.e. will run an analysis job type).
+DEBUG 2025-08-19 02:41:51.595 UTC: 	 CRAB Client version: v3.250522
+DEBUG 2025-08-19 02:41:51.596 UTC: 	 Running on: Linux cmslpc202.fnal.gov 4.18.0-553.51.1.el8_10.x86_64 #1 SMP Wed Apr 30 04:00:07 EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-08-19 02:41:51.596 UTC: 	 Not using Singularity
+DEBUG 2025-08-19 02:41:51.596 UTC: 	 Operating System: AlmaLinux 8.10 (Cerulean Leopard)
+DEBUG 2025-08-19 02:41:51.596 UTC: 	 Executing command: 'submit'
+DEBUG 2025-08-19 02:41:51.599 UTC: 	 Found CRAB cache file /uscms/home/eertorer/.crab3
+DEBUG 2025-08-19 02:41:51.609 UTC: 	 Will use CRAB plugin ANALYSIS (i.e. will run an analysis job type).
+DEBUG 2025-08-23 04:36:05.983 UTC: 	 CRAB Client version: v3.250522
+DEBUG 2025-08-23 04:36:05.983 UTC: 	 Running on: Linux cmslpc202.fnal.gov 4.18.0-553.51.1.el8_10.x86_64 #1 SMP Wed Apr 30 04:00:07 EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-08-23 04:36:05.983 UTC: 	 Not using Singularity
+DEBUG 2025-08-23 04:36:05.983 UTC: 	 Operating System: AlmaLinux 8.10 (Cerulean Leopard)
+DEBUG 2025-08-23 04:36:05.983 UTC: 	 Executing command: 'status'
+DEBUG 2025-08-23 04:36:05.983 UTC: 	 Found CRAB cache file /uscms/home/eertorer/.crab3
+DEBUG 2025-12-21 00:09:38.861 UTC: 	 CRAB Client version: v3.251020
+DEBUG 2025-12-21 00:09:38.861 UTC: 	 Running on: Linux cmslpc202.fnal.gov 4.18.0-553.51.1.el8_10.x86_64 #1 SMP Wed Apr 30 04:00:07 EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-12-21 00:09:38.861 UTC: 	 Not using Singularity
+DEBUG 2025-12-21 00:09:38.861 UTC: 	 Operating System: AlmaLinux 8.10 (Cerulean Leopard)
+DEBUG 2025-12-21 00:09:38.861 UTC: 	 Executing command: 'checkwrite'
+DEBUG 2025-12-21 00:09:38.861 UTC: 	 Found CRAB cache file /uscms/home/eertorer/.crab3
+DEBUG 2025-12-21 00:09:38.870 UTC: 	 Checking credentials
+DEBUG 2025-12-21 00:09:38.870 UTC: 	 Found proxy file /uscms/home/eertorer/x509up_u23897
+DEBUG 2025-12-21 00:09:38.870 UTC: 	 Making sure it has proper VOMS extension
+DEBUG 2025-12-21 00:09:38.870 UTC: 	 Executing command :
+ voms-proxy-info --vo --file /uscms/home/eertorer/x509up_u23897
+DEBUG 2025-12-21 00:09:38.895 UTC: 	 output : cms
+
+ error: 
+ retcode : 0
+DEBUG 2025-12-21 00:09:38.895 UTC: 	 Getting proxy life time left
+DEBUG 2025-12-21 00:09:38.895 UTC: 	 Executing command :
+ voms-proxy-info --actimeleft --timeleft --file /uscms/home/eertorer/x509up_u23897
+DEBUG 2025-12-21 00:09:38.912 UTC: 	 output : 661647
+661647
+
+ error: 
+ retcode : 0
+DEBUG 2025-12-21 00:09:38.912 UTC: 	 Proxy valid for 183:47:27 hours
+DEBUG 2025-12-21 00:09:38.912 UTC: 	 Retrieving username ...
+DEBUG 2025-12-21 00:09:38.912 UTC: 	 Retrieving username from CRIC...
+DEBUG 2025-12-21 00:09:40.481 UTC: 	 username is eertorer
+INFO 2025-12-21 00:09:41.299 UTC: 	 Rucio client intialized for account eertorer
+DEBUG 2025-12-21 00:09:41.300 UTC: 	 Command use: checkwrite
+DEBUG 2025-12-21 00:09:41.300 UTC: 	 Options use: ['--site=T3_US_CMU']
+DEBUG 2025-12-21 00:09:41.300 UTC: 	 Instance is None
+DEBUG 2025-12-21 00:09:41.300 UTC: 	 Server base url is None
+DEBUG 2025-12-21 00:09:41.300 UTC: 	 Retrieving username ...
+DEBUG 2025-12-21 00:09:41.300 UTC: 	 Retrieving username from CRIC...
+DEBUG 2025-12-21 00:09:42.498 UTC: 	 username is eertorer
+INFO 2025-12-21 00:09:42.498 UTC: 	 Will check write permission in the default location /store/user/<username>
+INFO 2025-12-21 00:09:42.498 UTC: 	 Validating LFN /store/user/eertorer...
+INFO 2025-12-21 00:09:42.498 UTC: 	 LFN /store/user/eertorer is valid.
+INFO 2025-12-21 00:09:42.514 UTC: 	 Will use `gfal-copy`, `gfal-rm` commands for checking write permissions
+INFO 2025-12-21 00:09:42.514 UTC: 	 Will check write permission in /store/user/eertorer on site T3_US_CMU
+INFO 2025-12-21 00:09:42.644 UTC: 	 Will use PFN: davs://cmsdata.phys.cmu.edu:1094/store/user/eertorer/crab3checkwrite_20251220_180942_63dc9e11-25c9-411a-a178-fa9d36fab7ab/63dc9e11-25c9-411a-a178-fa9d36fab7ab.tmp
+INFO 2025-12-21 00:09:42.645 UTC: 	 
+Attempting to create (dummy) directory crab3checkwrite_20251220_180942_63dc9e11-25c9-411a-a178-fa9d36fab7ab and copy (dummy) file 63dc9e11-25c9-411a-a178-fa9d36fab7ab.tmp to /store/user/eertorer
+
+INFO 2025-12-21 00:09:42.648 UTC: 	 Executing command: which scram >/dev/null 2>&1 && eval `scram unsetenv -sh`; gfal-copy -p -v -t 180 file:///uscms_data/d3/eertorer/CMSSW_12_5_2_patch1/src/L1Trigger/L1THGCalUtilities/production/63dc9e11-25c9-411a-a178-fa9d36fab7ab.tmp 'davs://cmsdata.phys.cmu.edu:1094/store/user/eertorer/crab3checkwrite_20251220_180942_63dc9e11-25c9-411a-a178-fa9d36fab7ab/63dc9e11-25c9-411a-a178-fa9d36fab7ab.tmp'
+INFO 2025-12-21 00:09:42.649 UTC: 	 Please wait...
+INFO 2025-12-21 00:09:44.727 UTC: 	 
+Successfully created directory crab3checkwrite_20251220_180942_63dc9e11-25c9-411a-a178-fa9d36fab7ab and copied file 63dc9e11-25c9-411a-a178-fa9d36fab7ab.tmp to /store/user/eertorer
+INFO 2025-12-21 00:09:44.728 UTC: 	 
+Attempting to delete file davs://cmsdata.phys.cmu.edu:1094/store/user/eertorer/crab3checkwrite_20251220_180942_63dc9e11-25c9-411a-a178-fa9d36fab7ab/63dc9e11-25c9-411a-a178-fa9d36fab7ab.tmp
+
+INFO 2025-12-21 00:09:44.728 UTC: 	 Executing command: which scram >/dev/null 2>&1 && eval `scram unsetenv -sh`; gfal-rm -v -t 180 'davs://cmsdata.phys.cmu.edu:1094/store/user/eertorer/crab3checkwrite_20251220_180942_63dc9e11-25c9-411a-a178-fa9d36fab7ab/63dc9e11-25c9-411a-a178-fa9d36fab7ab.tmp'
+INFO 2025-12-21 00:09:44.728 UTC: 	 Please wait...
+INFO 2025-12-21 00:09:45.768 UTC: 	 
+Successfully deleted file davs://cmsdata.phys.cmu.edu:1094/store/user/eertorer/crab3checkwrite_20251220_180942_63dc9e11-25c9-411a-a178-fa9d36fab7ab/63dc9e11-25c9-411a-a178-fa9d36fab7ab.tmp
+INFO 2025-12-21 00:09:45.768 UTC: 	 
+Attempting to delete directory davs://cmsdata.phys.cmu.edu:1094/store/user/eertorer/crab3checkwrite_20251220_180942_63dc9e11-25c9-411a-a178-fa9d36fab7ab/
+
+INFO 2025-12-21 00:09:45.768 UTC: 	 Executing command: which scram >/dev/null 2>&1 && eval `scram unsetenv -sh`; gfal-rm -r -v -t 180 'davs://cmsdata.phys.cmu.edu:1094/store/user/eertorer/crab3checkwrite_20251220_180942_63dc9e11-25c9-411a-a178-fa9d36fab7ab/'
+INFO 2025-12-21 00:09:45.768 UTC: 	 Please wait...
+INFO 2025-12-21 00:09:46.896 UTC: 	 
+Successfully deleted directory davs://cmsdata.phys.cmu.edu:1094/store/user/eertorer/crab3checkwrite_20251220_180942_63dc9e11-25c9-411a-a178-fa9d36fab7ab/
+INFO 2025-12-21 00:09:46.898 UTC: 	 
+Checkwrite Result:
+INFO 2025-12-21 00:09:46.898 UTC: 	 Success: Able to write in /store/user/eertorer on site T3_US_CMU
+DEBUG 2025-12-21 01:11:33.853 UTC: 	 CRAB Client version: v3.251020
+DEBUG 2025-12-21 01:11:33.853 UTC: 	 Running on: Linux cmslpc202.fnal.gov 4.18.0-553.51.1.el8_10.x86_64 #1 SMP Wed Apr 30 04:00:07 EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-12-21 01:11:33.853 UTC: 	 Not using Singularity
+DEBUG 2025-12-21 01:11:33.853 UTC: 	 Operating System: AlmaLinux 8.10 (Cerulean Leopard)
+DEBUG 2025-12-21 01:11:33.853 UTC: 	 Executing command: 'checkwrite'
+DEBUG 2025-12-21 01:11:33.854 UTC: 	 Found CRAB cache file /uscms/home/eertorer/.crab3
+DEBUG 2025-12-21 01:12:01.657 UTC: 	 CRAB Client version: v3.251020
+DEBUG 2025-12-21 01:12:01.657 UTC: 	 Running on: Linux cmslpc202.fnal.gov 4.18.0-553.51.1.el8_10.x86_64 #1 SMP Wed Apr 30 04:00:07 EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-12-21 01:12:01.657 UTC: 	 Not using Singularity
+DEBUG 2025-12-21 01:12:01.657 UTC: 	 Operating System: AlmaLinux 8.10 (Cerulean Leopard)
+DEBUG 2025-12-21 01:12:01.657 UTC: 	 Executing command: 'checkwrite'
+DEBUG 2025-12-21 01:12:01.658 UTC: 	 Found CRAB cache file /uscms/home/eertorer/.crab3
+DEBUG 2025-12-21 01:12:01.659 UTC: 	 Checking credentials
+DEBUG 2025-12-21 01:12:01.659 UTC: 	 Found proxy file /uscms/home/eertorer/x509up_u23897
+DEBUG 2025-12-21 01:12:01.659 UTC: 	 Making sure it has proper VOMS extension
+DEBUG 2025-12-21 01:12:01.659 UTC: 	 Executing command :
+ voms-proxy-info --vo --file /uscms/home/eertorer/x509up_u23897
+DEBUG 2025-12-21 01:12:01.679 UTC: 	 output : cms
+
+ error: 
+ retcode : 0
+DEBUG 2025-12-21 01:12:01.679 UTC: 	 Getting proxy life time left
+DEBUG 2025-12-21 01:12:01.679 UTC: 	 Executing command :
+ voms-proxy-info --actimeleft --timeleft --file /uscms/home/eertorer/x509up_u23897
+DEBUG 2025-12-21 01:12:01.695 UTC: 	 output : 657904
+657904
+
+ error: 
+ retcode : 0
+DEBUG 2025-12-21 01:12:01.695 UTC: 	 Proxy valid for 182:45:04 hours
+DEBUG 2025-12-21 01:12:01.695 UTC: 	 Retrieving username ...
+DEBUG 2025-12-21 01:12:01.695 UTC: 	 Retrieving username from CRIC...
+DEBUG 2025-12-21 01:12:03.087 UTC: 	 username is eertorer
+INFO 2025-12-21 01:12:03.847 UTC: 	 Rucio client intialized for account eertorer
+DEBUG 2025-12-21 01:12:03.847 UTC: 	 Command use: checkwrite
+DEBUG 2025-12-21 01:12:03.847 UTC: 	 Options use: ['--site=T3_US_CMU']
+DEBUG 2025-12-21 01:12:03.847 UTC: 	 Instance is None
+DEBUG 2025-12-21 01:12:03.847 UTC: 	 Server base url is None
+DEBUG 2025-12-21 01:12:03.847 UTC: 	 Retrieving username ...
+DEBUG 2025-12-21 01:12:03.847 UTC: 	 Retrieving username from CRIC...
+DEBUG 2025-12-21 01:12:05.143 UTC: 	 username is eertorer
+INFO 2025-12-21 01:12:05.143 UTC: 	 Will check write permission in the default location /store/user/<username>
+INFO 2025-12-21 01:12:05.143 UTC: 	 Validating LFN /store/user/eertorer...
+INFO 2025-12-21 01:12:05.143 UTC: 	 LFN /store/user/eertorer is valid.
+INFO 2025-12-21 01:12:05.158 UTC: 	 Will use `gfal-copy`, `gfal-rm` commands for checking write permissions
+INFO 2025-12-21 01:12:05.158 UTC: 	 Will check write permission in /store/user/eertorer on site T3_US_CMU
+INFO 2025-12-21 01:12:05.287 UTC: 	 Will use PFN: davs://cmsdata.phys.cmu.edu:1094/store/user/eertorer/crab3checkwrite_20251220_191205_933ea1e5-297d-4313-a166-1ace9b01c417/933ea1e5-297d-4313-a166-1ace9b01c417.tmp
+INFO 2025-12-21 01:12:05.287 UTC: 	 
+Attempting to create (dummy) directory crab3checkwrite_20251220_191205_933ea1e5-297d-4313-a166-1ace9b01c417 and copy (dummy) file 933ea1e5-297d-4313-a166-1ace9b01c417.tmp to /store/user/eertorer
+
+INFO 2025-12-21 01:12:05.292 UTC: 	 Executing command: which scram >/dev/null 2>&1 && eval `scram unsetenv -sh`; gfal-copy -p -v -t 180 file:///uscms_data/d3/eertorer/CMSSW_12_5_2_patch1/src/L1Trigger/L1THGCalUtilities/production/933ea1e5-297d-4313-a166-1ace9b01c417.tmp 'davs://cmsdata.phys.cmu.edu:1094/store/user/eertorer/crab3checkwrite_20251220_191205_933ea1e5-297d-4313-a166-1ace9b01c417/933ea1e5-297d-4313-a166-1ace9b01c417.tmp'
+INFO 2025-12-21 01:12:05.292 UTC: 	 Please wait...
+INFO 2025-12-21 01:12:07.299 UTC: 	 
+Successfully created directory crab3checkwrite_20251220_191205_933ea1e5-297d-4313-a166-1ace9b01c417 and copied file 933ea1e5-297d-4313-a166-1ace9b01c417.tmp to /store/user/eertorer
+INFO 2025-12-21 01:12:07.299 UTC: 	 
+Attempting to delete file davs://cmsdata.phys.cmu.edu:1094/store/user/eertorer/crab3checkwrite_20251220_191205_933ea1e5-297d-4313-a166-1ace9b01c417/933ea1e5-297d-4313-a166-1ace9b01c417.tmp
+
+INFO 2025-12-21 01:12:07.299 UTC: 	 Executing command: which scram >/dev/null 2>&1 && eval `scram unsetenv -sh`; gfal-rm -v -t 180 'davs://cmsdata.phys.cmu.edu:1094/store/user/eertorer/crab3checkwrite_20251220_191205_933ea1e5-297d-4313-a166-1ace9b01c417/933ea1e5-297d-4313-a166-1ace9b01c417.tmp'
+INFO 2025-12-21 01:12:07.299 UTC: 	 Please wait...
+INFO 2025-12-21 01:12:08.368 UTC: 	 
+Successfully deleted file davs://cmsdata.phys.cmu.edu:1094/store/user/eertorer/crab3checkwrite_20251220_191205_933ea1e5-297d-4313-a166-1ace9b01c417/933ea1e5-297d-4313-a166-1ace9b01c417.tmp
+INFO 2025-12-21 01:12:08.368 UTC: 	 
+Attempting to delete directory davs://cmsdata.phys.cmu.edu:1094/store/user/eertorer/crab3checkwrite_20251220_191205_933ea1e5-297d-4313-a166-1ace9b01c417/
+
+INFO 2025-12-21 01:12:08.368 UTC: 	 Executing command: which scram >/dev/null 2>&1 && eval `scram unsetenv -sh`; gfal-rm -r -v -t 180 'davs://cmsdata.phys.cmu.edu:1094/store/user/eertorer/crab3checkwrite_20251220_191205_933ea1e5-297d-4313-a166-1ace9b01c417/'
+INFO 2025-12-21 01:12:08.368 UTC: 	 Please wait...
+INFO 2025-12-21 01:12:09.449 UTC: 	 
+Successfully deleted directory davs://cmsdata.phys.cmu.edu:1094/store/user/eertorer/crab3checkwrite_20251220_191205_933ea1e5-297d-4313-a166-1ace9b01c417/
+INFO 2025-12-21 01:12:09.450 UTC: 	 
+Checkwrite Result:
+INFO 2025-12-21 01:12:09.451 UTC: 	 Success: Able to write in /store/user/eertorer on site T3_US_CMU
+DEBUG 2025-12-21 01:12:47.977 UTC: 	 CRAB Client version: v3.251020
+DEBUG 2025-12-21 01:12:47.977 UTC: 	 Running on: Linux cmslpc202.fnal.gov 4.18.0-553.51.1.el8_10.x86_64 #1 SMP Wed Apr 30 04:00:07 EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-12-21 01:12:47.977 UTC: 	 Not using Singularity
+DEBUG 2025-12-21 01:12:47.977 UTC: 	 Operating System: AlmaLinux 8.10 (Cerulean Leopard)
+DEBUG 2025-12-21 01:12:47.977 UTC: 	 Executing command: 'kill'
+DEBUG 2025-12-21 01:12:47.977 UTC: 	 Found CRAB cache file /uscms/home/eertorer/.crab3
+ERROR 2025-12-21 01:12:47.978 UTC: 	 Error: Please indicate the CRAB project directory with --dir=<project-directory>.
+ERROR 2025-12-21 01:12:47.978 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.251020.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.251020.00/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])  # the crab command to be executed
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.251020.00/lib/CRABClient/Commands/SubCommand.py", line 281, in __init__
+    SubCommand.validateOptions(self)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.251020.00/lib/CRABClient/Commands/SubCommand.py", line 687, in validateOptions
+    raise ex
+CRABClient.ClientExceptions.MissingOptionException: [91mError[0m: Please indicate the CRAB project directory with --dir=<project-directory>.
+INFO 2025-12-21 01:12:47.979 UTC: 	 Log file is /uscms_data/d3/eertorer/CMSSW_12_5_2_patch1/src/L1Trigger/L1THGCalUtilities/production/crab.log
