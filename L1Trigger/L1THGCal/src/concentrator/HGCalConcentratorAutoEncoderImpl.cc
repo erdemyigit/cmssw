@@ -35,7 +35,9 @@ HGCalConcentratorAutoEncoderImpl::HGCalConcentratorAutoEncoderImpl(const edm::Pa
 //     printf("%d\n", i);
     nInputs_ *= i;
   }
-  printf("%d\n", nInputs_);
+  if (verbose_) {
+    printf("nInputs %d\n", nInputs_);
+  }
   
   // check the size of the inputs shapes
   if (encoderShape_.size() != encoderTensorDims_) {
@@ -221,14 +223,16 @@ void HGCalConcentratorAutoEncoderImpl::select(
 //   std::cout << "Value of inputTensorName_encoder_: " << inputTensorName_encoder_ << std::endl;
 //   std::cout << "Value of inputCondTensorName_encoder_: " << inputCondTensorName_encoder_ << std::endl;
 //   std::cout << "Value of outputTensorName_encoder_: " << outputTensorName_encoder_ << std::endl;
-  printf("\n originalCALQsum \n");
-  printf("%0.3f ", originalCALQsum);
-  printf("\n originalADCsum \n");
-  printf("%0.3f ", originalADCsum);
-  printf("\n originalINPUTsum \n");  
-  printf("%0.3f ", originalINPUTsum);
-  printf("\n modSum \n");
-  printf("%0.3f ", modSum);
+  if (verbose_) {
+    printf("\n originalCALQsum \n");
+    printf("%0.3f ", originalCALQsum);
+    printf("\n originalADCsum \n");
+    printf("%0.3f ", originalADCsum);
+    printf("\n originalINPUTsum \n");
+    printf("%0.3f ", originalINPUTsum);
+    printf("\n modSum \n");
+    printf("%0.3f ", modSum);
+  }
       
 //   printf("Cond Data\n");
     
@@ -337,8 +341,10 @@ void HGCalConcentratorAutoEncoderImpl::select(
       }
       
 if (decoderShape_[1] > 16){
-          printf("\nConditional Info\n");
-          fflush(stdout);
+          if (verbose_) {
+            printf("\nConditional Info\n");
+            fflush(stdout);
+          }
           HGCalTriggerDetId id(trigCellVecInput.at(0).detId());
           
           // 1. Eta: use geometric center of the silicon module (matches wafer.eta in training)
@@ -366,14 +372,15 @@ if (decoderShape_[1] > 16){
           // 4. Normalize the layer (Fixing the un-normalized layer bug!)
           decoder_input.flat<float>().data()[23] = ((double)id.layer() - 1.0) / 46.0; 
 
-          printf("INPUT\n");
-          for (unsigned i = 0; i < decoderShape_[1]; ++i) {
-            printf("%0.3f \n", decoder_input.flat<float>().data()[i]);
+          if (verbose_) {
+            printf("INPUT\n");
+            for (unsigned i = 0; i < decoderShape_[1]; ++i) {
+              printf("%0.3f \n", decoder_input.flat<float>().data()[i]);
+            }
+            printf("END OF Conditionals \n");
+            fflush(stdout);
           }
-          fflush(stdout);
-          printf("END OF Conditionals \n");
       }
-      fflush(stdout);
       
          
       std::vector<tensorflow::Tensor> decoder_outputs;
@@ -381,8 +388,10 @@ if (decoderShape_[1] > 16){
                       {{inputTensorName_decoder_, decoder_input}},
                       {outputTensorName_decoder_},
                       &decoder_outputs);
-      printf("Past Decoder\n");
-      fflush(stdout);
+      if (verbose_) {
+        printf("Past Decoder\n");
+        fflush(stdout);
+      }
       for (uint i = 0; i < nInputs_; i++) {
         ae_outputArray[i] = decoder_outputs[0].flat<float>().data()[i];
       }
