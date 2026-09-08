@@ -207,45 +207,156 @@ chains.register_concentrator("Badae", concentrator.CreateAutoencoder(
 
 #eLinkAE_5 = cms.PSet(encoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/AE_hyperband_8_15/best_model_eLink_5_post_seed_variation_larger_dataset_for_CMSSW/encoder_search.pb'),                                  decoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/AE_hyperband_8_15/best_model_eLink_5_post_seed_variation_larger_dataset_for_CMSSW/decoder_search.pb'))
 
-# CAE Concentrators
-eLinkCAE_2 = cms.PSet(encoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/results_march30_2026/CAE/eLink2/encoder_CAE_model.pb'), decoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/results_march30_2026/CAE/eLink2/decoder_CAE_model.pb'))
-eLinkCAE_3 = cms.PSet(encoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/results_march30_2026/CAE/eLink3/encoder_CAE_model.pb'), decoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/results_march30_2026/CAE/eLink3/decoder_CAE_model.pb'))
-eLinkCAE_4 = cms.PSet(encoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/results_march30_2026/CAE/eLink4/encoder_CAE_model.pb'), decoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/results_march30_2026/CAE/eLink4/decoder_CAE_model.pb'))
-eLinkCAE_5 = cms.PSet(encoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/results_march30_2026/CAE/eLink5/encoder_CAE_model.pb'), decoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/results_march30_2026/CAE/eLink5/decoder_CAE_model.pb'))
+# =============================================================================
+# July-2026 production block (v3-trained results_march30_2026 models) -- kept
+# commented for the record.  It overrode linkToGraphMap without touching
+# bitsPerLink; see ECON_V4_BRANCH_NOTES.md.  Superseded by the v4 block below.
+# =============================================================================
+# # CAE Concentrators
+# eLinkCAE_2 = cms.PSet(encoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/results_march30_2026/CAE/eLink2/encoder_CAE_model.pb'), decoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/results_march30_2026/CAE/eLink2/decoder_CAE_model.pb'))
+# eLinkCAE_3 = cms.PSet(encoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/results_march30_2026/CAE/eLink3/encoder_CAE_model.pb'), decoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/results_march30_2026/CAE/eLink3/decoder_CAE_model.pb'))
+# eLinkCAE_4 = cms.PSet(encoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/results_march30_2026/CAE/eLink4/encoder_CAE_model.pb'), decoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/results_march30_2026/CAE/eLink4/decoder_CAE_model.pb'))
+# eLinkCAE_5 = cms.PSet(encoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/results_march30_2026/CAE/eLink5/encoder_CAE_model.pb'), decoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/results_march30_2026/CAE/eLink5/decoder_CAE_model.pb'))
+#
+# # AE Concentrators
+# eLinkAE_2 = cms.PSet(encoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/results_march30_2026/AE/eLink2/encoder_AE_model.pb'), decoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/results_march30_2026/AE/eLink2/decoder_AE_model.pb'))
+# eLinkAE_3 = cms.PSet(encoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/results_march30_2026/AE/eLink3/encoder_AE_model.pb'), decoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/results_march30_2026/AE/eLink3/decoder_AE_model.pb'))
+# eLinkAE_4 = cms.PSet(encoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/results_march30_2026/AE/eLink4/encoder_AE_model.pb'), decoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/results_march30_2026/AE/eLink4/decoder_AE_model.pb'))
+# eLinkAE_5 = cms.PSet(encoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/results_march30_2026/AE/eLink5/encoder_AE_model.pb'), decoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/results_march30_2026/AE/eLink5/decoder_AE_model.pb'))
+#
+#
+# # NOTE: Decoder dimensions for CAE (1,24) and AE (1,16) vary due to the concetanation of 8D Conditional Variables Vector 
+# chains.register_concentrator("CAE", concentrator.CreateAutoencoder(
+#     useTransverseADC=True,
+#     skipAE=False,
+#     modelFiles = [eLinkCAE_2,eLinkCAE_3,eLinkCAE_4,eLinkCAE_5],
+#     useModuleFactor=False,
+#     bitShiftNormalization=True,
+#     normByMax=False,
+#     verbose =True, 
+#     linkToGraphMap = cms.vuint32([0,0,0,1,1,2,2,3,3,3,3,3,3,3]),
+#     encoderShape=cms.vuint32([1,8,8,1]),
+#     decoderShape=cms.vuint32([1,24]),
+# ))
+#
+#
+# chains.register_concentrator("AE", concentrator.CreateAutoencoder(
+#     useTransverseADC=True,
+#     skipAE=False,
+#     modelFiles = [eLinkAE_2,eLinkAE_3,eLinkAE_4,eLinkAE_5],
+#     useModuleFactor=False,
+#     bitShiftNormalization=True,
+#     normByMax=False,
+#     verbose =True, 
+#     linkToGraphMap = cms.vuint32([0,0,0,1,1,2,2,3,3,3,3,3,3,3]),
+#     encoderShape=cms.vuint32([1,8,8,1]),
+#     decoderShape=cms.vuint32([1,16]),
+# ))
 
-# AE Concentrators
-eLinkAE_2 = cms.PSet(encoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/results_march30_2026/AE/eLink2/encoder_AE_model.pb'), decoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/results_march30_2026/AE/eLink2/decoder_AE_model.pb'))
-eLinkAE_3 = cms.PSet(encoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/results_march30_2026/AE/eLink3/encoder_AE_model.pb'), decoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/results_march30_2026/AE/eLink3/decoder_AE_model.pb'))
-eLinkAE_4 = cms.PSet(encoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/results_march30_2026/AE/eLink4/encoder_AE_model.pb'), decoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/results_march30_2026/AE/eLink4/decoder_AE_model.pb'))
-eLinkAE_5 = cms.PSet(encoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/results_march30_2026/AE/eLink5/encoder_AE_model.pb'), decoderModelFile = cms.FileInPath('L1Trigger/L1THGCal/data/models/results_march30_2026/AE/eLink5/decoder_AE_model.pb'))
+# =============================================================================
+# ECON v4 models (branch econ-v4-production)
+# Full derivation: L1Trigger/L1THGCal/test/ECON_V4_BRANCH_NOTES.md
+#
+# (i) ROUTING nLinks -> graph.  NO linkToGraphMap override: the upstream default
+#     from L1Trigger/L1THGCal/python/l1tHGCalConcentratorProducer_cfi.py applies:
+#         linkToGraphMapping = [0,0,0,1,2,3,3,3,3,3,3,3,3,3,3]
+#         index (= nLinks):     0 1 2 3 4 5 6 7 8 9 . . . . 14
+#     nLinks 2 -> graph 0 (eLink-2 model), 3 -> graph 1 (eLink-3 model),
+#     4 -> graph 2 (eLink-4 model), >=5 -> graph 3 (eLink-5 model).
+#     The v4 training classes (class_from_nlinks / Table 1a) are exactly this
+#     table, so the July-2026 override [0,0,0,1,1,2,2,3,...] must NOT be used.
+#
+# (ii) bitsPerLink is indexed by nLinks INDEPENDENTLY of linkToGraphMap
+#     (HGCalConcentratorAutoEncoderImpl.cc: bitsPerOutput = bitsPerLink.at(nLinks);
+#     graphIndex = linkToGraphMap.at(nLinks)).  Each graph must therefore be fed
+#     the latent depth it was trained at: eLink-2/3/4/5 models -> 3/5/7/9 bits.
+#                          nLinks:  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14
+econ_v4_bitsPerLink = cms.vint32([0, 1, 3, 5, 7, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9])
+#                    graph index:  0  0  0  1  2  3  3  3  3  3  3  3  3  3  3
+#            graph's trained bits: 3  3  3  5  7  9  9  9  9  9  9  9  9  9  9
+#     Indices 2..14 match their graph.  Index 0 is unreachable (nLinks = 0 never
+#     occurs in the CMSSW link table).  This vector equals the upstream default
+#     autoEncoder_bitsPerOutputLink; it is written out so the pairing is explicit.
+#
+# (iii) ######## DECISION REQUIRED: nLinks == 1 (index 1) ########
+#     Under CMSSW's own link table (hgcal_trigger_link_mapping_120links_v1.json)
+#     485,731 wafers = 2.51 % have nLinks = 1, spread over planes 7-47.
+#     linkToGraphMap[1] = 0 routes them to the eLink-2 model (trained at 3 bits)
+#     while bitsPerLink[1] = 1 truncates their latent to 1 bit.
+#       Option A (CURRENT, upstream value): bitsPerLink[1] = 1.  Honest 1-eLink
+#                bandwidth, but the 3-bit graph decodes a 1-bit latent it never saw.
+#       Option B: bitsPerLink[1] = 3.  The graph sees its trained depth; the module
+#                is credited 2 bits per latent value more than one eLink carries.
+#       (A 5th, 1-bit-trained graph would be Option C; out of scope here.)
+#     NOT decided on this branch -- index 1 is deliberately left at 1.
+#     ################################################################
+#
+# (iv) decoderShape: AE decoder input is [1,16]; CAE and FiLM decoders take
+#     [1,24] (16 latent ++ 8 conditions; the FiLM graph is exported single-input
+#     and slices internally).  encoderShape stays [1,8,8,1] (fixed by the ASIC).
+#
+# Model files: training/final_run/export_cmssw.py in the ECON_CAE repo writes
+#     <out>/<ARM>/eLink<N>/encoder_<ARM>_model.pb and decoder_<ARM>_model.pb
+# for ARM in {AE, CAE, FILM}, N in {2,3,4,5}.  Copy them under
+# L1Trigger/L1THGCal/data/models/<tag>/ and replace the PLACEHOLDER root below.
+# =============================================================================
+ECON_V4_MODEL_ROOT = '/PATH/TO/econ_v4_models'   # PLACEHOLDER -- e.g. 'L1Trigger/L1THGCal/data/models/econ_v4'
 
+def _econ_v4_model(arm, nLinks):
+    d = '%s/%s/eLink%d' % (ECON_V4_MODEL_ROOT, arm, nLinks)
+    return cms.PSet(encoderModelFile = cms.FileInPath('%s/encoder_%s_model.pb' % (d, arm)),
+                    decoderModelFile = cms.FileInPath('%s/decoder_%s_model.pb' % (d, arm)))
 
-# NOTE: Decoder dimensions for CAE (1,24) and AE (1,16) vary due to the concetanation of 8D Conditional Variables Vector 
-chains.register_concentrator("CAE", concentrator.CreateAutoencoder(
-    useTransverseADC=True,
-    skipAE=False,
-    modelFiles = [eLinkCAE_2,eLinkCAE_3,eLinkCAE_4,eLinkCAE_5],
-    useModuleFactor=False,
-    bitShiftNormalization=True,
-    normByMax=False,
-    verbose =True, 
-    linkToGraphMap = cms.vuint32([0,0,0,1,1,2,2,3,3,3,3,3,3,3]),
-    encoderShape=cms.vuint32([1,8,8,1]),
-    decoderShape=cms.vuint32([1,24]),
-))
-
-
+# ---- AE arm (plain autoencoder, decoderShape [1,16]) ------------------------
+eLinkAE_2, eLinkAE_3, eLinkAE_4, eLinkAE_5 = [_econ_v4_model('AE', n) for n in (2, 3, 4, 5)]
 chains.register_concentrator("AE", concentrator.CreateAutoencoder(
     useTransverseADC=True,
     skipAE=False,
-    modelFiles = [eLinkAE_2,eLinkAE_3,eLinkAE_4,eLinkAE_5],
+    modelFiles = [eLinkAE_2, eLinkAE_3, eLinkAE_4, eLinkAE_5],   # graph 0,1,2,3
     useModuleFactor=False,
     bitShiftNormalization=True,
     normByMax=False,
-    verbose =True, 
-    linkToGraphMap = cms.vuint32([0,0,0,1,1,2,2,3,3,3,3,3,3,3]),
+    verbose =True,
+    bitsPerLink = econ_v4_bitsPerLink,
+    # linkToGraphMap: upstream default, see (i) -- do not override
     encoderShape=cms.vuint32([1,8,8,1]),
     decoderShape=cms.vuint32([1,16]),
+    preserveModuleSum=True,
+))
+
+# ---- CAE arm (concat-conditioned, decoderShape [1,24]) ----------------------
+eLinkCAE_2, eLinkCAE_3, eLinkCAE_4, eLinkCAE_5 = [_econ_v4_model('CAE', n) for n in (2, 3, 4, 5)]
+chains.register_concentrator("CAE", concentrator.CreateAutoencoder(
+    useTransverseADC=True,
+    skipAE=False,
+    modelFiles = [eLinkCAE_2, eLinkCAE_3, eLinkCAE_4, eLinkCAE_5],   # graph 0,1,2,3
+    useModuleFactor=False,
+    bitShiftNormalization=True,
+    normByMax=False,
+    verbose =True,
+    bitsPerLink = econ_v4_bitsPerLink,
+    # linkToGraphMap: upstream default, see (i) -- do not override
+    encoderShape=cms.vuint32([1,8,8,1]),
+    decoderShape=cms.vuint32([1,24]),
+    preserveModuleSum=True,
+))
+
+# ---- FiLM arm (film-conditioned decoder, single-input graph, decoderShape [1,24])
+# Registered but not in standard_concentrators by default; append 'FILM' to run it.
+eLinkFILM_2, eLinkFILM_3, eLinkFILM_4, eLinkFILM_5 = [_econ_v4_model('FILM', n) for n in (2, 3, 4, 5)]
+chains.register_concentrator("FILM", concentrator.CreateAutoencoder(
+    useTransverseADC=True,
+    skipAE=False,
+    modelFiles = [eLinkFILM_2, eLinkFILM_3, eLinkFILM_4, eLinkFILM_5],   # graph 0,1,2,3
+    useModuleFactor=False,
+    bitShiftNormalization=True,
+    normByMax=False,
+    verbose =True,
+    bitsPerLink = econ_v4_bitsPerLink,
+    # linkToGraphMap: upstream default, see (i) -- do not override
+    encoderShape=cms.vuint32([1,8,8,1]),
+    decoderShape=cms.vuint32([1,24]),
+    preserveModuleSum=True,
 ))
 
 
