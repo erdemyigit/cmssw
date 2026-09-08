@@ -202,7 +202,11 @@ void HGCalConcentratorAutoEncoderImpl::select(
   for(unsigned u=0; u<8; ++u){
     for(unsigned v=0; v<8; ++v){
       originalADCsum += aeInputUtil_.getADC(u,v);
-      originalCALQsum += aeInputUtil_.getCALQ(u,v);
+      // Skip CALQ at index (0,0) to match training preprocessing
+      // (process_data.py uses range(1,64) for CALQ, skipping CALQ0)
+      if (!(u == 0 && v == 0)) {
+        originalCALQsum += aeInputUtil_.getCALQ(u,v);
+      }
       originalINPUTsum += aeInputUtil_.getInput(u,v)/aeInputUtil_.getInputNorm();
     }
   }
@@ -337,8 +341,13 @@ if (decoderShape_[1] > 16){
           fflush(stdout);
           HGCalTriggerDetId id(trigCellVecInput.at(0).detId());
           
-          // 1. Normalize Eta, V, and U (Fixing integer division bugs!)
-          decoder_input.flat<float>().data()[16] = trigCellVecInput[0].eta() / 3.1;
+          // 1. Eta: use geometric center of the silicon module (matches wafer.eta in training)
+          unsigned moduleId = triggerTools_.getTriggerGeometry()->getModuleFromTriggerCell(
+              trigCellVecInput[0].detId());
+          GlobalPoint modulePos = triggerTools_.getTriggerGeometry()->getModulePosition(moduleId);
+          decoder_input.flat<float>().data()[16] = modulePos.eta() / 3.1;
+          
+          // V and U
           decoder_input.flat<float>().data()[17] = (double)id.waferV() / 12.0;
           decoder_input.flat<float>().data()[18] = (double)id.waferU() / 12.0;
           
@@ -351,8 +360,7 @@ if (decoderShape_[1] > 16){
           decoder_input.flat<float>().data()[20] = wafertype1;
           decoder_input.flat<float>().data()[21] = wafertype2;
           
-          // 3. Log transform sumCALQ 
-          // (originalCALQsum is calculated correctly at line 194, before the model runs!)
+          // 3. Log transform sumCALQ (now skips CALQ0 to match training)
           decoder_input.flat<float>().data()[22] = std::log(originalCALQsum + 1.0);
           
           // 4. Normalize the layer (Fixing the un-normalized layer bug!)
