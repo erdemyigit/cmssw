@@ -40,6 +40,25 @@ removed. Note that `verbose` is supplied only by `L1THGCalUtilities/python/conce
 the bare `autoEncoder_conc_proc` PSet in the cfi has no `verbose` key (pre-existing, unchanged).
 The production test config sets `verbose=True`, so its stdout is unchanged by this hunk.
 
+### 2b. Same file — encoder input fill was verbose-gated (production defect; fixed here)
+
+In production (`cmssw/production/HGCalConcentratorAutoEncoderImpl.cc` L246-249) the only write to
+the encoder input tensor, `encoder_input.flat<float>().data()[i] = ae_inputArray[i];`, sat inside
+`if(verbose_){ printf("INPUT\n"); for (...) { <fill>; printf(...); } }`. With `verbose = 0` the
+encoder therefore ran on an unfilled tensor and the AE/CAE output was garbage. Verified
+independently: a `verbose=0` run on falcon produced non-physical AE/CAE trees while the
+`Threshold0` tree was identical to production, and the expanded-config diff against production
+was `verbose` only. **Shipped physics is unaffected**: the July-2026 production/CRAB config set
+`verbose=True` (`cmssw/config/test_CAE.py`), so the fill always executed.
+
+Fix on this branch: the fill loop runs unconditionally before the `if(verbose_)` block, which now
+contains only the `printf` loop (one hunk). Audit with a brace-depth walker that flags any
+non-print statement inside an `if(verbose_)` block: production has exactly one offending block
+(L246-255), this branch before the fix exactly one (L254-263), after the fix zero.
+
+`CreateAutoencoder` (`L1THGCalUtilities/python/concentrator.py`) defaults to `verbose=0`; every
+autoencoder block in `test_CAE.py` sets `verbose=True`. `verbose=0` is safe only with this fix.
+
 ### 3. `L1Trigger/L1THGCalUtilities/test/test_CAE.py` — v4 model configuration
 
 The July-2026 production block is retained as a comment; a new v4 block follows it.

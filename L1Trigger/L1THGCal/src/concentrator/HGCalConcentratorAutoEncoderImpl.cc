@@ -251,10 +251,12 @@ void HGCalConcentratorAutoEncoderImpl::select(
 //                                    encoderShape_[2], encoderShape_[3]});
   
 
+  for (unsigned i = 0; i < nInputs_; ++i) {
+    encoder_input.flat<float>().data()[i] = ae_inputArray[i];
+  }
   if(verbose_){
       printf("INPUT\n");
       for (unsigned i = 0; i < nInputs_; ++i) {
-        encoder_input.flat<float>().data()[i] = ae_inputArray[i];
         printf("%0.3f ", ae_inputArray[i]);
         if((i+1)%8==0){
             printf("\n");

@@ -308,6 +308,12 @@ def _econ_v4_model(arm, nLinks):
                     decoderModelFile = cms.FileInPath('%s/decoder_%s_model.pb' % (d, arm)))
 
 # ---- AE arm (plain autoencoder, decoderShape [1,16]) ------------------------
+# verbose: CreateAutoencoder defaults to verbose=0 (L1THGCalUtilities/python/
+# concentrator.py); production and every block here set verbose=True.  Before the
+# econ-v4-production fix in HGCalConcentratorAutoEncoderImpl.cc the encoder-input
+# tensor was filled INSIDE the if(verbose_) block, so verbose=0 ran the encoder on
+# an unfilled tensor (non-physical AE/CAE output).  verbose=0 is safe only with
+# that fix; verbose=True is kept here for log-compatibility with production.
 eLinkAE_2, eLinkAE_3, eLinkAE_4, eLinkAE_5 = [_econ_v4_model('AE', n) for n in (2, 3, 4, 5)]
 chains.register_concentrator("AE", concentrator.CreateAutoencoder(
     useTransverseADC=True,
@@ -316,7 +322,7 @@ chains.register_concentrator("AE", concentrator.CreateAutoencoder(
     useModuleFactor=False,
     bitShiftNormalization=True,
     normByMax=False,
-    verbose =True,
+    verbose =True,   # see verbose note above
     bitsPerLink = econ_v4_bitsPerLink,
     # linkToGraphMap: upstream default, see (i) -- do not override
     encoderShape=cms.vuint32([1,8,8,1]),
