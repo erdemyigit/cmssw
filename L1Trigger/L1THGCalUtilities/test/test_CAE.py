@@ -296,14 +296,26 @@ econ_v4_bitsPerLink = cms.vint32([0, 1, 3, 5, 7, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9])
 #     and slices internally).  encoderShape stays [1,8,8,1] (fixed by the ASIC).
 #
 # Model files: training/final_run/export_cmssw.py in the ECON_CAE repo writes
-#     <out>/<ARM>/eLink<N>/encoder_<ARM>_model.pb and decoder_<ARM>_model.pb
-# for ARM in {AE, CAE, FILM}, N in {2,3,4,5}.  Copy them under
-# L1Trigger/L1THGCal/data/models/<tag>/ and replace the PLACEHOLDER root below.
+#     <out>/eLink<N>/<ARM>/encoder_<ARM>_model.pb and decoder_<ARM>_model.pb
+# for ARM in {AE, CAE, FILM}, N in {2,3,4,5} (VERIFIED against the 2026-09-09 export;
+# an earlier revision of this comment had the two levels the wrong way round).
+# Copy the tree under L1Trigger/L1THGCal/data/models/<tag>/ -- it must live inside a
+# package's data/ directory so that `scram b` installs it and CRAB ships it in the
+# sandbox (the whole tree is ~1.3 MB, far under the sandbox limit) -- then replace
+# the PLACEHOLDER root below.
+#
+# FULL-STATISTICS / CRAB RUNS: set verbose=False in every block below.  verbose=True
+# prints an 8x8 dump per encoded module: measured 9-10 GB of stdout per ~350-event
+# input file with 5 chains (2026-09-09, falcon), which over hundreds of jobs is
+# unmanageable.  verbose=False is CORRECT ONLY WITH the encoder-fill fix on this
+# branch (commit 0706ff22) -- see note 2b in ECON_V4_BRANCH_NOTES.md.
 # =============================================================================
 ECON_V4_MODEL_ROOT = '/PATH/TO/econ_v4_models'   # PLACEHOLDER -- e.g. 'L1Trigger/L1THGCal/data/models/econ_v4'
 
 def _econ_v4_model(arm, nLinks):
-    d = '%s/%s/eLink%d' % (ECON_V4_MODEL_ROOT, arm, nLinks)
+    # Layout is eLink-FIRST, matching what export_cmssw.py actually writes:
+    #   <root>/eLink<N>/<ARM>/{encoder,decoder}_<ARM>_model.pb
+    d = '%s/eLink%d/%s' % (ECON_V4_MODEL_ROOT, nLinks, arm)
     return cms.PSet(encoderModelFile = cms.FileInPath('%s/encoder_%s_model.pb' % (d, arm)),
                     decoderModelFile = cms.FileInPath('%s/decoder_%s_model.pb' % (d, arm)))
 
