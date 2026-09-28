@@ -3,6 +3,7 @@
 #include <set>
 
 #include "DataFormats/HGCDigi/interface/HGCDigiCollections.h"
+#include "FWCore/MessageLogger/interface/MessageLogger.h"
 
 DEFINE_EDM_PLUGIN(HGCalConcentratorFactory, HGCalConcentratorProcessorSelection, "HGCalConcentratorProcessorSelection");
 
@@ -37,6 +38,7 @@ HGCalConcentratorProcessorSelection::HGCalConcentratorProcessorSelection(const e
         superTriggerCellImpl_ = std::make_unique<HGCalConcentratorSuperTriggerCellImpl>(conf);
       if (conf.existsAs<bool>("stcLinkAware") && conf.getParameter<bool>("stcLinkAware") && !stcFormatImpl_[0]) {
         stcLinkAware_ = true;
+        stcLinkAwareDebug_ = conf.getUntrackedParameter<bool>("stcLinkAwareDebug", false);
         const size_t nsize = conf.getParameter<std::vector<unsigned>>("stcSize").size();
         // {STC size, exponent bits, mantissa bits, energy division}; no LSB dropped for STC/CTC values (spec sec. 13.4)
         const std::array<std::tuple<unsigned, uint32_t, uint32_t, std::string>, kNStcFormats> formats = {
@@ -243,5 +245,15 @@ void HGCalConcentratorProcessorSelection::selectSuperTriggerCellsLinkAware(
     if (kMaxSTC_[f][etx - 1] >= ids.size())
       break;  // fits (if none does, the last candidate is used with truncation)
   }
+  const size_t nBefore = trigCellVecOutput.size();
   stcFormatImpl_[chosen]->select(trigCellVecInput, trigCellVecOutput, kMaxSTC_[chosen][etx - 1], ids);
+  if (stcLinkAwareDebug_) {
+    std::set<uint32_t> sent;
+    for (size_t i = nBefore; i < trigCellVecOutput.size(); i++)
+      sent.insert(stcFormatImpl_[chosen]->stcId(trigCellVecOutput[i].detId()));
+    edm::LogVerbatim("STCLINK") << "STCLINK module=" << module << " nlinks=" << nLinks << " hd=" << highDensity
+                                << " format=" << chosen << " units=" << ids.size()
+                                << " cap=" << kMaxSTC_[chosen][etx - 1] << " sums_sent=" << sent.size()
+                                << " tcs_out=" << trigCellVecOutput.size() - nBefore;
+  }
 }

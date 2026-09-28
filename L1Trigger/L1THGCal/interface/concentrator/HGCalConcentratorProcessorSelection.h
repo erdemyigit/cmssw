@@ -56,6 +56,7 @@ private:
       {4, 8, 13, 17, 22},  // CTC4 4E+3M: 7-bit sum, no address
       {2, 4, 7, 9, 12}};   // STC16 5E+4M: 9-bit sum + 4-bit address
   bool stcLinkAware_ = false;
+  bool stcLinkAwareDebug_ = false;  // untracked: one LogVerbatim line per module decision (validation only)
   std::array<std::unique_ptr<HGCalConcentratorSuperTriggerCellImpl>, kNStcFormats> stcFormatImpl_;
   void selectSuperTriggerCellsLinkAware(uint32_t module,
                                         const std::vector<l1t::HGCalTriggerCell>& trigCellVecInput,
