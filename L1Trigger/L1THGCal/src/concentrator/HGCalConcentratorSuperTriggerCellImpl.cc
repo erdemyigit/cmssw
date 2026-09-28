@@ -182,3 +182,19 @@ void HGCalConcentratorSuperTriggerCellImpl::select(const std::vector<l1t::HGCalT
 
   createAllTriggerCells(STCs, trigCellVecOutput);
 }
+
+void HGCalConcentratorSuperTriggerCellImpl::select(const std::vector<l1t::HGCalTriggerCell>& trigCellVecInput,
+                                                   std::vector<l1t::HGCalTriggerCell>& trigCellVecOutput,
+                                                   unsigned maxSTC,
+                                                   const std::vector<uint32_t>& allSTCIds) {
+  std::unordered_map<unsigned, SuperTriggerCell> STCs;
+  for (const l1t::HGCalTriggerCell& tc : trigCellVecInput) {
+    uint32_t stcid = superTCmapping_.getCoarseTriggerCellId(tc.detId());
+    STCs[stcid].add(tc, stcid);
+  }
+  if (maxSTC < allSTCIds.size()) {  // drop the sums beyond the first maxSTC positions of the module
+    for (size_t i = maxSTC; i < allSTCIds.size(); i++)
+      STCs.erase(allSTCIds[i]);
+  }
+  createAllTriggerCells(STCs, trigCellVecOutput);
+}

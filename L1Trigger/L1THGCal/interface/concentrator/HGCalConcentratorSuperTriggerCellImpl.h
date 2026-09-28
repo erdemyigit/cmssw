@@ -16,6 +16,13 @@ public:
 
   void select(const std::vector<l1t::HGCalTriggerCell>& trigCellVecInput,
               std::vector<l1t::HGCalTriggerCell>& trigCellVecOutput);
+  // ECON-T with fewer active eTx than a full module needs transmits only the first maxSTC sums in fixed module order
+  // (ECON-T spec v10, sec. 14.2); allSTCIds = every STC id of the module, sorted, defines that order.
+  void select(const std::vector<l1t::HGCalTriggerCell>& trigCellVecInput,
+              std::vector<l1t::HGCalTriggerCell>& trigCellVecOutput,
+              unsigned maxSTC,
+              const std::vector<uint32_t>& allSTCIds);
+  uint32_t stcId(uint32_t tcId) const { return superTCmapping_.getCoarseTriggerCellId(tcId); }
   void setGeometry(const HGCalTriggerGeometryBase* const geom) {
     triggerTools_.setGeometry(geom);
     coarseTCmapping_.setGeometry(geom);

@@ -1,5 +1,6 @@
 #include "L1Trigger/L1THGCal/interface/concentrator/HGCalConcentratorProcessorSelection.h"
 #include <limits>
+#include <set>
 
 #include "DataFormats/HGCDigi/interface/HGCDigiCollections.h"
 
@@ -34,6 +35,25 @@ HGCalConcentratorProcessorSelection::HGCalConcentratorProcessorSelection(const e
       selectionType_[subdet] = superTriggerCellSelect;
       if (!superTriggerCellImpl_)
         superTriggerCellImpl_ = std::make_unique<HGCalConcentratorSuperTriggerCellImpl>(conf);
+      if (conf.existsAs<bool>("stcLinkAware") && conf.getParameter<bool>("stcLinkAware") && !stcFormatImpl_[0]) {
+        stcLinkAware_ = true;
+        const size_t nsize = conf.getParameter<std::vector<unsigned>>("stcSize").size();
+        // {STC size, exponent bits, mantissa bits, energy division}; no LSB dropped for STC/CTC values (spec sec. 13.4)
+        const std::array<std::tuple<unsigned, uint32_t, uint32_t, std::string>, kNStcFormats> formats = {
+            {{4, 5, 4, "superTriggerCell"}, {4, 4, 3, "superTriggerCell"}, {4, 4, 3, "equalShare"},
+             {16, 5, 4, "superTriggerCell"}}};
+        for (unsigned f = 0; f < kNStcFormats; f++) {
+          edm::ParameterSet pf(conf);
+          pf.addParameter<std::vector<unsigned>>("stcSize", std::vector<unsigned>(nsize, std::get<0>(formats[f])));
+          pf.addParameter<std::string>("type_energy_division", std::get<3>(formats[f]));
+          edm::ParameterSet comp(conf.getParameterSet("superTCCompression"));
+          comp.addParameter<uint32_t>("exponentBits", std::get<1>(formats[f]));
+          comp.addParameter<uint32_t>("mantissaBits", std::get<2>(formats[f]));
+          comp.addParameter<uint32_t>("truncationBits", 0);
+          pf.addParameter<edm::ParameterSet>("superTCCompression", comp);
+          stcFormatImpl_[f] = std::make_unique<HGCalConcentratorSuperTriggerCellImpl>(pf);
+        }
+      }
     } else if (selectionType[subdet] == "autoEncoder") {
       selectionType_[subdet] = autoEncoderSelect;
       if (!autoEncoderImpl_)
@@ -62,6 +82,9 @@ void HGCalConcentratorProcessorSelection::run(const edm::Handle<l1t::HGCalTrigge
     bestChoiceImpl_->setGeometry(geometry());
   if (superTriggerCellImpl_)
     superTriggerCellImpl_->setGeometry(geometry());
+  for (auto& impl : stcFormatImpl_)
+    if (impl)
+      impl->setGeometry(geometry());
   if (autoEncoderImpl_)
     autoEncoderImpl_->setGeometry(geometry());
   if (coarsenerImpl_)
@@ -117,7 +140,10 @@ void HGCalConcentratorProcessorSelection::run(const edm::Handle<l1t::HGCalTrigge
           }
           break;
         case superTriggerCellSelect:
-          superTriggerCellImpl_->select(trigCellVecCoarsened, trigCellVecOutput);
+          if (stcLinkAware_)
+            selectSuperTriggerCellsLinkAware(module_trigcell.first, trigCellVecCoarsened, trigCellVecOutput);
+          else
+            superTriggerCellImpl_->select(trigCellVecCoarsened, trigCellVecOutput);
           break;
         case autoEncoderSelect:
           autoEncoderImpl_->select(geometry()->getLinksInModule(module_trigcell.first),
@@ -146,7 +172,10 @@ void HGCalConcentratorProcessorSelection::run(const edm::Handle<l1t::HGCalTrigge
                                   trigCellVecNotSelected);
           break;
         case superTriggerCellSelect:
-          superTriggerCellImpl_->select(module_trigcell.second, trigCellVecOutput);
+          if (stcLinkAware_)
+            selectSuperTriggerCellsLinkAware(module_trigcell.first, module_trigcell.second, trigCellVecOutput);
+          else
+            superTriggerCellImpl_->select(module_trigcell.second, trigCellVecOutput);
           break;
         case autoEncoderSelect:
           autoEncoderImpl_->select(geometry()->getLinksInModule(module_trigcell.first),
@@ -182,4 +211,37 @@ void HGCalConcentratorProcessorSelection::run(const edm::Handle<l1t::HGCalTrigge
       autoEncoderCollOutput.push_back(0, aeVal);
     }
   }
+}
+
+void HGCalConcentratorProcessorSelection::selectSuperTriggerCellsLinkAware(
+    uint32_t module,
+    const std::vector<l1t::HGCalTriggerCell>& trigCellVecInput,
+    std::vector<l1t::HGCalTriggerCell>& trigCellVecOutput) {
+  if (trigCellVecInput.empty())
+    return;
+  const unsigned nLinks = geometry()->getLinksInModule(module);
+  if (nLinks == 0)  // no active eTx: nothing is transmitted
+    return;
+  const unsigned etx = std::min(nLinks, kMaxEtx_);
+  const uint32_t tc0 = trigCellVecInput.at(0).detId();
+  const bool highDensity =
+      triggerTools_.isSilicon(tc0) && triggerTools_.thicknessIndex(tc0) == kHighDensityThickness_;
+  // high density: finest format that fits every sum of the module; low density and scintillator: STC16 (nominal)
+  static const std::vector<unsigned> candidatesHD = {kSTC4_5E4M, kSTC4_4E3M, kCTC4_4E3M, kSTC16_5E4M};
+  static const std::vector<unsigned> candidatesLD = {kSTC16_5E4M};
+  const auto& candidates = highDensity ? candidatesHD : candidatesLD;
+  const auto moduleTCs = geometry()->getTriggerCellsFromModule(module);
+
+  unsigned chosen = candidates.back();
+  std::vector<uint32_t> ids;
+  for (unsigned f : candidates) {
+    std::set<uint32_t> uniq;
+    for (uint32_t tc : moduleTCs)
+      uniq.insert(stcFormatImpl_[f]->stcId(tc));
+    ids.assign(uniq.begin(), uniq.end());
+    chosen = f;
+    if (kMaxSTC_[f][etx - 1] >= ids.size())
+      break;  // fits (if none does, the last candidate is used with truncation)
+  }
+  stcFormatImpl_[chosen]->select(trigCellVecInput, trigCellVecOutput, kMaxSTC_[chosen][etx - 1], ids);
 }
