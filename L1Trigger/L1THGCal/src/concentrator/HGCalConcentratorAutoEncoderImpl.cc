@@ -371,11 +371,13 @@ if (decoderShape_[1] > 16){
           decoder_input.flat<float>().data()[20] = wafertype1;
           decoder_input.flat<float>().data()[21] = wafertype2;
           
-          // 3. Log transform sumCALQ (now skips CALQ0 to match training)
-          decoder_input.flat<float>().data()[22] = std::log(originalCALQsum + 1.0);
+          // 3. log(1 + CALQ sum over all 64 cells): training (preprocessing v2) sums CALQ0..CALQ63, so CALQ(0,0),
+          //    which originalCALQsum skips, is added back here. originalCALQsum itself feeds only the verbose printout.
+          decoder_input.flat<float>().data()[22] = std::log(originalCALQsum + aeInputUtil_.getCALQ(0, 0) + 1.0);
           
-          // 4. Normalize the layer (Fixing the un-normalized layer bug!)
-          decoder_input.flat<float>().data()[23] = ((double)id.layer() - 1.0) / 46.0; 
+          // 4. (layer - 1)/46 with the CE-E offset for CE-H (id.layer() restarts at 1 in CE-H), as the training
+          //    ntuple's wafer layer (HGCalTriggerNtupleHGCWafers: layerWithOffset)
+          decoder_input.flat<float>().data()[23] = ((double)triggerTools_.layerWithOffset(id) - 1.0) / 46.0;
 
           if (verbose_) {
             printf("INPUT\n");
