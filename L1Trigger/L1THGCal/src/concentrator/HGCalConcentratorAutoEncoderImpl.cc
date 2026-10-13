@@ -1,7 +1,9 @@
 #include "L1Trigger/L1THGCal/interface/concentrator/HGCalConcentratorAutoEncoderImpl.h"
 #include "DataFormats/ForwardDetId/interface/HGCalTriggerDetId.h"
+#include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include <iomanip>
 #include <cmath> 
+#include <sstream>
 
 // Following example of implementing graphloading from here:
 // https://gitlab.cern.ch/mrieger/CMSSW-TensorFlowExamples/-/blob/master/GraphLoading/
@@ -28,7 +30,8 @@ HGCalConcentratorAutoEncoderImpl::HGCalConcentratorAutoEncoderImpl(const edm::Pa
       aeInputUtil_(bitsPerADC_, bitsPerNorm_, bitsPerCALQ_, bitsPerInput_,
                   useModuleFactor_, bitShiftNormalization_, useTransverseADC_, 
                   normByMax_),
-      verbose_(conf.getParameter<int>("verbose")){
+      verbose_(conf.getParameter<int>("verbose")),
+      condInputDebug_(conf.getUntrackedParameter<std::string>("condInputDebug", "")){
   // find total size of the expected input shape
   nInputs_ = 1;
   for (const auto& i : encoderShape_) {
@@ -381,6 +384,16 @@ if (decoderShape_[1] > 16){
             }
             printf("END OF Conditionals \n");
             fflush(stdout);
+          }
+          if (!condInputDebug_.empty()) {
+            std::ostringstream os;
+            os << std::setprecision(17) << "CONDIN " << condInputDebug_ << " module=" << moduleId
+               << " layer=" << id.layer() << " layerWithOffset=" << triggerTools_.layerWithOffset(id)
+               << " nLinks=" << nLinks << " modSum=" << modSum << " calq00=" << aeInputUtil_.getCALQ(0, 0)
+               << " in=";
+            for (unsigned i = 0; i < decoderShape_[1]; ++i)
+              os << (i ? "," : "") << decoder_input.flat<float>().data()[i];
+            edm::LogVerbatim("CONDIN") << os.str();
           }
       }
       

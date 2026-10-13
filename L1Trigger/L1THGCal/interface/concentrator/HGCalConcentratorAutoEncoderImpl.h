@@ -86,6 +86,8 @@ private:
   AEinputUtil aeInputUtil_;
 
   int verbose_;
+  // untracked: when non-empty, one LogVerbatim("CONDIN") line per module with the full decoder input (validation only)
+  std::string condInputDebug_;
   
 };
 
