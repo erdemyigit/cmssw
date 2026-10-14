@@ -88,7 +88,14 @@ private:
   int verbose_;
   // untracked: when non-empty, one LogVerbatim("CONDIN") line per module with the full decoder input (validation only)
   std::string condInputDebug_;
-  
+  // untracked: with condInputDebug, also print the encoder input and the decoder output of every module (large)
+  bool condInputDebugFull_;
+
+  // Optional per-graph affine map of the decoder's condition inputs, y = float((double(x) - condOffset) / condScale),
+  // from condOffset/condScale in that graph's modelFiles PSet. Empty for a graph without them: inputs unchanged.
+  std::vector<std::vector<double>> condOffset_;
+  std::vector<std::vector<double>> condScale_;
+
 };
 
 #endif

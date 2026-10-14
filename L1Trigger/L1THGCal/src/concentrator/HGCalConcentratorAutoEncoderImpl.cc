@@ -31,7 +31,8 @@ HGCalConcentratorAutoEncoderImpl::HGCalConcentratorAutoEncoderImpl(const edm::Pa
                   useModuleFactor_, bitShiftNormalization_, useTransverseADC_, 
                   normByMax_),
       verbose_(conf.getParameter<int>("verbose")),
-      condInputDebug_(conf.getUntrackedParameter<std::string>("condInputDebug", "")){
+      condInputDebug_(conf.getUntrackedParameter<std::string>("condInputDebug", "")),
+      condInputDebugFull_(conf.getUntrackedParameter<bool>("condInputDebugFull", false)){
   // find total size of the expected input shape
   nInputs_ = 1;
   for (const auto& i : encoderShape_) {
@@ -59,6 +60,44 @@ HGCalConcentratorAutoEncoderImpl::HGCalConcentratorAutoEncoderImpl(const edm::Pa
   for (const auto& modelFilePset : modelFilePaths_) {
     std::string encoderPath = modelFilePset.getParameter<edm::FileInPath>("encoderModelFile").fullPath();
     std::string decoderPath = modelFilePset.getParameter<edm::FileInPath>("decoderModelFile").fullPath();
+
+    // optional condition preprocessing of this graph: both vectors or neither, one value per condition input
+    const bool hasCondOffset = modelFilePset.existsAs<std::vector<double>>("condOffset");
+    const bool hasCondScale = modelFilePset.existsAs<std::vector<double>>("condScale");
+    if (hasCondOffset != hasCondScale) {
+      throw cms::Exception("BadInitialization") << "condOffset and condScale must be given together (graph "
+                                                << condOffset_.size() << ")";
+    }
+    std::vector<double> condOffset, condScale;
+    if (hasCondOffset) {
+      condOffset = modelFilePset.getParameter<std::vector<double>>("condOffset");
+      condScale = modelFilePset.getParameter<std::vector<double>>("condScale");
+      if (decoderShape_[1] <= nEncodedLayerNodes_) {
+        throw cms::Exception("BadInitialization") << "condOffset/condScale given for a decoder without condition inputs";
+      }
+      const unsigned nCond = decoderShape_[1] - nEncodedLayerNodes_;
+      if (condOffset.size() != nCond || condScale.size() != nCond) {
+        throw cms::Exception("BadInitialization") << "condOffset/condScale need " << nCond << " values each, got "
+                                                  << condOffset.size() << "/" << condScale.size();
+      }
+      for (unsigned i = 0; i < nCond; ++i) {
+        if (!std::isfinite(condOffset[i]) || !std::isfinite(condScale[i]) || condScale[i] == 0.) {
+          throw cms::Exception("BadInitialization") << "condOffset/condScale value " << i << " not usable";
+        }
+      }
+    }
+    if (!condInputDebug_.empty()) {
+      std::ostringstream os;
+      os << std::hexfloat << "CONDAFFINE " << condInputDebug_ << " graph=" << condOffset_.size() << " offset=";
+      for (unsigned i = 0; i < condOffset.size(); ++i)
+        os << (i ? "," : "") << condOffset[i];
+      os << " scale=";
+      for (unsigned i = 0; i < condScale.size(); ++i)
+        os << (i ? "," : "") << condScale[i];
+      edm::LogVerbatim("CONDIN") << os.str();
+    }
+    condOffset_.push_back(condOffset);
+    condScale_.push_back(condScale);
 
     graphDef_encoder_ = std::unique_ptr<tensorflow::GraphDef>{tensorflow::loadGraphDef(encoderPath)};
 
@@ -344,7 +383,8 @@ void HGCalConcentratorAutoEncoderImpl::select(
       for (int i = 0; i < nEncodedLayerNodes_; i++) {
         decoder_input.flat<float>().data()[i] = ae_encodedLayer_[i];
       }
-      
+      std::string condDebugLine;  // CONDIN printout, emitted after the decoder ran (condInputDebug only)
+
 if (decoderShape_[1] > 16){
           if (verbose_) {
             printf("\nConditional Info\n");
@@ -379,6 +419,18 @@ if (decoderShape_[1] > 16){
           //    ntuple's wafer layer (HGCalTriggerNtupleHGCWafers: layerWithOffset)
           decoder_input.flat<float>().data()[23] = ((double)triggerTools_.layerWithOffset(id) - 1.0) / 46.0;
 
+          // 5. Optional per-graph condition preprocessing, the arithmetic of the training's cond_norm.apply: the stored
+          //    float32 value -> double, (x - offset) / scale in double, -> float32. Without constants: unchanged.
+          const unsigned nCond = decoderShape_[1] - nEncodedLayerNodes_;
+          float* condIn = decoder_input.flat<float>().data() + nEncodedLayerNodes_;
+          const std::vector<float> rawCond(condIn, condIn + nCond);
+          const std::vector<double>& condOffset = condOffset_.at(graphIndex);
+          if (!condOffset.empty()) {
+            const std::vector<double>& condScale = condScale_.at(graphIndex);
+            for (unsigned i = 0; i < nCond; ++i)
+              condIn[i] = static_cast<float>((static_cast<double>(condIn[i]) - condOffset[i]) / condScale[i]);
+          }
+
           if (verbose_) {
             printf("INPUT\n");
             for (unsigned i = 0; i < decoderShape_[1]; ++i) {
@@ -395,16 +447,34 @@ if (decoderShape_[1] > 16){
                << " in=";
             for (unsigned i = 0; i < decoderShape_[1]; ++i)
               os << (i ? "," : "") << decoder_input.flat<float>().data()[i];
-            edm::LogVerbatim("CONDIN") << os.str();
+            os << " graph=" << graphIndex << " raw=";
+            for (unsigned i = 0; i < nCond; ++i)
+              os << (i ? "," : "") << rawCond[i];
+            if (condInputDebugFull_) {
+              os << " enc=";
+              for (unsigned i = 0; i < nInputs_; ++i)
+                os << (i ? "," : "") << encoder_input.flat<float>().data()[i];
+            }
+            condDebugLine = os.str();
           }
       }
-      
-         
+
+
       std::vector<tensorflow::Tensor> decoder_outputs;
       tensorflow::run(session_decoder_.at(graphIndex).get(),
                       {{inputTensorName_decoder_, decoder_input}},
                       {outputTensorName_decoder_},
                       &decoder_outputs);
+      if (!condDebugLine.empty()) {
+        if (condInputDebugFull_) {
+          std::ostringstream os;
+          os << std::setprecision(17) << " out=";
+          for (unsigned i = 0; i < nInputs_; ++i)
+            os << (i ? "," : "") << decoder_outputs[0].flat<float>().data()[i];
+          condDebugLine += os.str();
+        }
+        edm::LogVerbatim("CONDIN") << condDebugLine;
+      }
       if (verbose_) {
         printf("Past Decoder\n");
         fflush(stdout);
